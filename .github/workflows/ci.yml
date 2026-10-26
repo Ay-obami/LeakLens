@@ -18,9 +18,11 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: 1.95.0
-          components: clippy
+          components: clippy, rustfmt
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
+      - name: Check Rustfmt
+        run: cargo +1.95.0 fmt --all -- --check
       - name: Run all workspace tests
         run: cargo +1.95.0 test --workspace
       - name: Strict Clippy
