@@ -4,7 +4,10 @@
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use rand::{SeedableRng, rngs::StdRng};
+use rand::{
+    SeedableRng,
+    rngs::{StdRng, SysRng},
+};
 use rusqlite::Connection;
 use secrecy::SecretVec;
 use zcash_client_backend::data_api::{AccountBirthday, WalletWrite};
@@ -28,7 +31,10 @@ pub fn open_testnet_wallet(path: &Path) -> Result<TestnetWalletDb> {
         path,
         Network::TestNetwork,
         SystemClock,
-        Box::new(StdRng::from_os_rng()),
+        Box::new(
+            StdRng::try_from_rng(&mut SysRng)
+                .context("seeding wallet CSPRNG from the operating system")?,
+        ),
     )
     .with_context(|| format!("opening testnet wallet DB at {}", path.display()))?;
     init_wallet_db(&mut wallet_db, None)
