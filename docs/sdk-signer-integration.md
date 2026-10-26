@@ -12,7 +12,10 @@ This file accompanies `src/sdk_signer.rs` and must be integrated by adding
    do not offer a way to skip the review in the host wallet's send path.
 4. After approval, invoke `execute_reviewed_zcash_signing!` with the pending
    session, current policy, the wallet's existing database, network parameters,
-   Sapling provers, `SpendingKeys`, `OvkPolicy`, and optional expiry height.
+   Sapling provers, and `SpendingKeys`. The expiry override is intentionally
+   fixed to `None`, deriving expiry from the reviewed proposal. The outgoing
+   viewing-key policy is fixed to `OvkPolicy::Sender`, so the sender can
+   recover external shielded outputs; custom/Discard policies are not supported.
 5. The macro rechecks the canonical proposal and policy through the consumed
    session, then directly invokes
    `zcash_client_backend::data_api::wallet::create_proposed_transactions`.
@@ -33,6 +36,14 @@ This file accompanies `src/sdk_signer.rs` and must be integrated by adding
   alone cannot prove successful signing.
 - Compatibility is scoped to SDK v0.24.0: later SDK versions add a `Clock`
   and RNG to this function's parameters; upgrading requires a deliberate edit.
+- The SDK signature has two error generic parameters not inferable from input
+  arguments. This integration selects `Infallible` for proposal-selection and
+  change-selection errors, because selection already happened upstream.
+- Because the current review fingerprint does not bind outgoing-viewing-key
+  choice, this macro does **not** accept a caller-selected `OvkPolicy`. It
+  always uses SDK `OvkPolicy::Sender`. The sender may decrypt external
+  shielded outputs; a wallet requiring custom or discarded outgoing-viewing
+  keys must extend the signed review context before changing this behavior.
 - This integration has no automated real-wallet signing test. In addition to
   existing gate tests, it requires wallet integration tests on a testnet
   database before a production deployment.
