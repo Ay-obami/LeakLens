@@ -5,7 +5,6 @@
 
 use anyhow::{Result, anyhow, ensure};
 use zcash_client_backend::{
-    ShieldedPool,
     data_api::{
         InputSource,
         wallet::{ConfirmationsPolicy, propose_standard_transfer_to_address},
@@ -14,7 +13,7 @@ use zcash_client_backend::{
     proposal::Proposal,
 };
 use zcash_keys::address::Address;
-use zcash_protocol::{consensus::Network, value::Zatoshis};
+use zcash_protocol::{ShieldedPool, consensus::Network, value::Zatoshis};
 
 use crate::storage::TestnetWalletDb;
 
