@@ -139,6 +139,20 @@ fn modified_canonical_bytes_and_policy_reject_before_signing() {
 }
 
 #[test]
+fn equivalent_policy_value_not_pointer_identity_authorizes() {
+    let reviewed_policy = Policy { version: 7 };
+    let gate = GateReview::inspect(&facts(PoolKind::Sapling), &reviewed_policy, b"canonical-a")
+        .expect("valid review");
+    let independently_loaded_policy = Policy { version: 7 };
+    let result = gate.authorize_and_execute(
+        &independently_loaded_policy,
+        || Ok::<_, ()>(b"canonical-a".to_vec()),
+        || Ok::<_, ()>("approved"),
+    );
+    assert_eq!(result, Ok("approved"));
+}
+
+#[test]
 fn encoder_failure_and_empty_proposal_never_authorize() {
     let review = review(PoolKind::Sapling, b"canonical-a");
     let invoked = Cell::new(false);

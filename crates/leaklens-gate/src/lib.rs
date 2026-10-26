@@ -59,6 +59,7 @@ pub enum GateRunError<E> {
 /// constructors are exposed; the core engine is run inside `inspect`.
 pub struct GateReview {
     fingerprint: ProposalFingerprint,
+    reviewed_policy: Policy,
     assessment: PrivacyAssessment,
     acknowledged: bool,
 }
@@ -77,6 +78,7 @@ impl GateReview {
         }
         Ok(Self {
             fingerprint: fingerprint_canonical_proposal(canonical_proposal),
+            reviewed_policy: *policy,
             assessment: assess(facts, policy),
             acknowledged: false,
         })
@@ -119,7 +121,8 @@ impl GateReview {
         encode_current: impl FnOnce() -> Result<Vec<u8>, E>,
         sign: impl FnOnce() -> Result<R, E>,
     ) -> Result<R, GateRunError<E>> {
-        if current_policy.version != self.assessment.policy_version {
+        // Compare the complete reviewed policy, not just its version.
+        if current_policy != &self.reviewed_policy {
             return Err(GateRunError::Gate(GateError::PolicyChanged));
         }
         if !self.assessment.complete {
