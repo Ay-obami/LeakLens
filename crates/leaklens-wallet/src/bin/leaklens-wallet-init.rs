@@ -9,6 +9,9 @@ use zcash_protocol::consensus::Network;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .map_err(|_| anyhow::anyhow!("TLS crypto provider was already initialized incompatibly"))?;
     // Caller supplies exactly four positional arguments. Never accept seeds
     // or spending keys on the command line.
     let args: Vec<_> = env::args_os().skip(1).collect();
