@@ -903,7 +903,9 @@ name = "leaklens-zcash"
 version = "0.1.0"
 dependencies = [
  "leaklens-core",
+ "nonempty",
  "orchard",
+ "prost",
  "zcash_address",
  "zcash_client_backend",
  "zcash_keys",
