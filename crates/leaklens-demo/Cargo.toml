@@ -10,6 +10,8 @@ leaklens-core = { path = "../leaklens-core" }
 leaklens-gate = { path = "../leaklens-gate" }
 leaklens-zcash = { path = "../leaklens-zcash" }
 leaklens-wallet = { path = "../leaklens-wallet" }
+rand = "0.10"
+zcash_client_sqlite = "=0.23.0-pre.2"
 zcash_client_backend.workspace = true
 zcash_keys.workspace = true
 zcash_protocol.workspace = true

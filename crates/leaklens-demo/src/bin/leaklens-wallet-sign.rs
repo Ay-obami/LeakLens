@@ -14,6 +14,7 @@ use std::{
     path::Path,
 };
 use zcash_client_backend::data_api::{Account, WalletRead, wallet::SpendingKeys};
+use zcash_client_sqlite::util::SystemClock;
 use zcash_keys::{
     address::Address,
     keys::{UnifiedAddressRequest, UnifiedSpendingKey},
@@ -84,11 +85,14 @@ fn main() -> Result<()> {
         .map_err(|error| anyhow::anyhow!("cannot derive wallet key: {error:?}"))?;
     let keys = SpendingKeys::from_unified_spending_key(usk);
     let prover = LocalTxProver::bundled();
+    let mut rng = rand::rng();
     let ids = leaklens_demo::execute_reviewed_zcash_signing!(
         pending,
         &policy,
         &mut db,
         &Network::TestNetwork,
+        &SystemClock,
+        &mut rng,
         &prover,
         &prover,
         &keys
