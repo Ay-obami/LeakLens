@@ -7,3 +7,4 @@ description = "Proposal-bound pre-authorization privacy gate for Zcash wallets"
 
 [dependencies]
 sha2 = "0.10"
+leaklens-core = { path = "../leaklens-core" }
