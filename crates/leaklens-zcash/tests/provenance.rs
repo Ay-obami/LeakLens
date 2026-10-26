@@ -14,9 +14,9 @@ use zcash_client_backend::{
 };
 use zcash_keys::address::Address;
 use zcash_protocol::{
+    PoolType,
     consensus::{BlockHeight, Network},
     value::Zatoshis,
-    PoolType,
 };
 use zcash_transparent::{
     address::TransparentAddress,
@@ -67,7 +67,9 @@ fn output_pools() -> BTreeMap<usize, PoolType> {
 
 fn balance_with_transparent_change() -> TransactionBalance {
     TransactionBalance::new(
-        vec![ChangeValue::transparent(Zatoshis::const_from_u64(CHANGE_VALUE))],
+        vec![ChangeValue::transparent(Zatoshis::const_from_u64(
+            CHANGE_VALUE,
+        ))],
         Zatoshis::const_from_u64(FEE_VALUE),
     )
     .unwrap()
@@ -109,7 +111,10 @@ fn sdk_rejects_payment_without_a_selected_pool() {
         false,
         false,
     );
-    assert!(invalid.is_err(), "SDK must reject missing pool before adapter receives a typed Step");
+    assert!(
+        invalid.is_err(),
+        "SDK must reject missing pool before adapter receives a typed Step"
+    );
 }
 
 #[test]
@@ -135,7 +140,10 @@ fn sdk_rejects_forward_or_nonexistent_prior_step_reference() {
             ConfirmationsPolicy::default(),
             NonEmpty::singleton(step),
         );
-        assert!(proposal.is_err(), "invalid reference must not become a valid proposal");
+        assert!(
+            proposal.is_err(),
+            "invalid reference must not become a valid proposal"
+        );
     }
 }
 
@@ -190,7 +198,9 @@ fn prior_transparent_payment_is_recognized_as_transparent_funding() {
 #[test]
 fn prior_ephemeral_change_is_recognized_as_transparent_funding() {
     let ephemeral_balance = TransactionBalance::new(
-        vec![ChangeValue::ephemeral_transparent(Zatoshis::const_from_u64(CHANGE_VALUE))],
+        vec![ChangeValue::ephemeral_transparent(
+            Zatoshis::const_from_u64(CHANGE_VALUE),
+        )],
         Zatoshis::const_from_u64(FEE_VALUE),
     )
     .unwrap();

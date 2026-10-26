@@ -7,8 +7,8 @@
 use std::io::{self, BufRead, Write};
 
 use leaklens_core::Certainty;
-use leaklens_gate::{GateDecision, GateReview};
 use leaklens_core::Policy;
+use leaklens_gate::{GateDecision, GateReview};
 use leaklens_zcash::fixture::{sample_shielded_proposal, sample_transparent_proposal};
 
 mod bridge;
@@ -31,7 +31,10 @@ pub fn preview_review(
     output: &mut impl Write,
 ) -> io::Result<PreviewOutcome> {
     writeln!(output, "LeakLens — pre-signing privacy review")?;
-    writeln!(output, "This is a risk assessment, not a guarantee of anonymity.")?;
+    writeln!(
+        output,
+        "This is a risk assessment, not a guarantee of anonymity."
+    )?;
 
     for finding in &review.assessment().findings {
         let certainty = match finding.certainty {
@@ -43,18 +46,35 @@ pub fn preview_review(
             Some(payment) => format!("step {}, payment {}", finding.step_index + 1, payment + 1),
             None => format!("step {}", finding.step_index + 1),
         };
-        writeln!(output, "{} [{}] {}: {}", finding.code, certainty, location, finding.message)?;
+        writeln!(
+            output,
+            "{} [{}] {}: {}",
+            finding.code, certainty, location, finding.message
+        )?;
     }
 
     match review.decision() {
         GateDecision::DenyIncomplete => {
-            writeln!(output, "INSPECTION INCOMPLETE: authorization is unavailable; revise or abort.")?;
-            writeln!(output, "Type REVISE to change the payment; any other input aborts.")?;
+            writeln!(
+                output,
+                "INSPECTION INCOMPLETE: authorization is unavailable; revise or abort."
+            )?;
+            writeln!(
+                output,
+                "Type REVISE to change the payment; any other input aborts."
+            )?;
             let choice = read_choice(&mut input)?;
-            Ok(if choice == "REVISE" { PreviewOutcome::ReviseProposal } else { PreviewOutcome::Abort })
+            Ok(if choice == "REVISE" {
+                PreviewOutcome::ReviseProposal
+            } else {
+                PreviewOutcome::Abort
+            })
         }
         GateDecision::RequireAcknowledgment => {
-            writeln!(output, "Type ACKNOWLEDGE to accept the listed risks, or REVISE to change the payment.")?;
+            writeln!(
+                output,
+                "Type ACKNOWLEDGE to accept the listed risks, or REVISE to change the payment."
+            )?;
             let choice = read_choice(&mut input)?;
             if choice == "REVISE" {
                 return Ok(PreviewOutcome::ReviseProposal);
@@ -62,12 +82,20 @@ pub fn preview_review(
             if choice != "ACKNOWLEDGE" {
                 return Ok(PreviewOutcome::Abort);
             }
-            review.acknowledge().map_err(|error| io::Error::other(format!("{error:?}")))?;
+            review
+                .acknowledge()
+                .map_err(|error| io::Error::other(format!("{error:?}")))?;
             Ok(PreviewOutcome::ProceedToWallet)
         }
         GateDecision::Allow => {
-            writeln!(output, "No known exposure was flagged by this policy. This is not an anonymity guarantee.")?;
-            writeln!(output, "Type CONTINUE to return to the wallet authorization gate, or REVISE.")?;
+            writeln!(
+                output,
+                "No known exposure was flagged by this policy. This is not an anonymity guarantee."
+            )?;
+            writeln!(
+                output,
+                "Type CONTINUE to return to the wallet authorization gate, or REVISE."
+            )?;
             match read_choice(&mut input)?.as_str() {
                 "CONTINUE" => Ok(PreviewOutcome::ProceedToWallet),
                 "REVISE" => Ok(PreviewOutcome::ReviseProposal),
@@ -122,17 +150,28 @@ pub fn run_sdk_fixture_demo_mode(
     let mut pending = PendingZcashReview::inspect(&proposal, policy)
         .map_err(|error| io::Error::other(format!("SDK proposal review failed: {error:?}")))?;
 
-    writeln!(output, "DEMONSTRATION ONLY: SDK-validated proposal with full SDK protobuf fingerprint.")?;
-    writeln!(output, "NOT SIGNING. No wallet credentials or broadcasting are involved.")?;
+    writeln!(
+        output,
+        "DEMONSTRATION ONLY: SDK-validated proposal with full SDK protobuf fingerprint."
+    )?;
+    writeln!(
+        output,
+        "NOT SIGNING. No wallet credentials or broadcasting are involved."
+    )?;
     match preview_review(pending.review_mut(), input, output)? {
         PreviewOutcome::Abort | PreviewOutcome::ReviseProposal => Ok(DemoStatus::Cancelled),
         PreviewOutcome::ProceedToWallet => {
             pending
                 .execute(&policy, |_same_borrowed_sdk_proposal| {
-                        writeln!(output, "NO-OP CALLBACK REACHED — NOT SIGNING OR BROADCASTING")?;
-                        Ok::<(), io::Error>(())
-                    })
-                .map_err(|error| io::Error::other(format!("Gate denied demo callback: {error:?}")))?;
+                    writeln!(
+                        output,
+                        "NO-OP CALLBACK REACHED — NOT SIGNING OR BROADCASTING"
+                    )?;
+                    Ok::<(), io::Error>(())
+                })
+                .map_err(|error| {
+                    io::Error::other(format!("Gate denied demo callback: {error:?}"))
+                })?;
             Ok(DemoStatus::NoopReached)
         }
     }
