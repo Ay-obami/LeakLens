@@ -30,6 +30,16 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                 continue;
             }
 
+            if (payment.recipient_kind == RecipientKind::Transparent
+                && payment.selected_pool != PoolKind::Transparent)
+                || (payment.recipient_kind == RecipientKind::Shielded
+                    && payment.selected_pool == PoolKind::Transparent)
+            {
+                complete = false;
+                findings.push(incomplete(step_index, Some(payment_index), "Recipient kind conflicts with the selected output pool"));
+                continue;
+            }
+
             if payment.selected_pool == PoolKind::Transparent {
                 findings.push(Finding {
                     code: "LL-001",
@@ -40,7 +50,7 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                     message: "The transparent recipient and payment amount will be publicly visible",
                 });
 
-                if step.has_shielded_inputs {
+                if step.has_shielded_inputs || step.has_prior_shielded_funding {
                     findings.push(Finding {
                         code: "LL-003",
                         step_index,
@@ -61,6 +71,27 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                         message: "The Unified Address is being paid through its transparent receiver",
                     });
                 }
+            }
+        }
+
+        if step.change_pools.contains(&PoolKind::Transparent) {
+            findings.push(Finding {
+                code: "LL-007",
+                step_index,
+                payment_index: None,
+                severity: Severity::Warning,
+                certainty: Certainty::PublicDisclosure,
+                message: "Transparent change output and its value will be publicly visible",
+            });
+            if step.has_shielded_inputs || step.has_prior_shielded_funding {
+                findings.push(Finding {
+                    code: "LL-003",
+                    step_index,
+                    payment_index: None,
+                    severity: Severity::Caution,
+                    certainty: Certainty::PossibleCorrelation,
+                    message: "Shielded funding alongside transparent change may create public correlation signals",
+                });
             }
         }
 
