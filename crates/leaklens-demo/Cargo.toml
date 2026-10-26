@@ -13,6 +13,8 @@ leaklens-wallet = { path = "../leaklens-wallet" }
 zcash_client_backend = "=0.24.0"
 zcash_keys = "=0.16.1"
 zcash_protocol = "=0.10.5"
+zcash_proofs = { version = "=0.30.0", features = ["bundled-prover"] }
+secrecy = "0.8"
 
 [dev-dependencies]
 sapling = { package = "sapling-crypto", version = "0.7" }
