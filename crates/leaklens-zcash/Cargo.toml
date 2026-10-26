@@ -19,4 +19,5 @@ zip32.workspace = true
 zcash_keys.workspace = true
 
 [dev-dependencies]
+leaklens-gate = { path = "../leaklens-gate" }
 nonempty = "=0.11.0"
