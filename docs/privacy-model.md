@@ -34,4 +34,4 @@ The policy engine only needs normalized transaction facts; do not pass seed phra
 
 ## Failure behavior
 
-Unsupported pool kinds, contradictory recipient/pool combinations, or unknown multi-step provenance must produce a detectable incomplete result; within the controlled gate, incomplete assessment denies authorization. Reassess if any proposal-relevant contents or policy version change. Known warnings may require explicit acknowledgment, but incomplete analysis is not an ordinary warning that can be clicked through.
+Unsupported pool kinds, contradictory recipient/pool combinations, or an unresolvable prior-step output reference must produce a detectable incomplete result; within the controlled gate, incomplete assessment denies authorization. Reassess if any proposal-relevant contents or policy version change. Known warnings may require explicit acknowledgment, but incomplete analysis is not an ordinary warning that can be clicked through.
