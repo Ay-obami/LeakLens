@@ -10,8 +10,8 @@ use secrecy::SecretVec;
 use zcash_client_backend::data_api::{AccountBirthday, WalletWrite};
 use zcash_client_sqlite::{WalletDb, util::SystemClock, wallet::init::init_wallet_db};
 use zcash_keys::{
-    keys::{UnifiedAddressRequest, UnifiedSpendingKey},
     address::UnifiedAddress,
+    keys::{UnifiedAddressRequest, UnifiedSpendingKey},
 };
 use zcash_protocol::consensus::Network;
 
