@@ -93,11 +93,37 @@ The shielded-only fixture reports no *known* exposure under the implemented rule
 - Incomplete proposals and missing warning acknowledgment fail closed in tested flows.
 - The optional signer seam fixes `OvkPolicy::Sender` and uses the proposal-derived expiry (`None` override).
 
+## Live funded-signing and NU7 broadcast checkpoint — 2026-10-26
+
+A separate, disposable testnet wallet received a shielded 1.00000000 TAZ
+funding note in block 4,544,325. On-chain receipt was verified by SDK wallet
+synchronization. A 0.01 TAZ shielded self-transfer was proposed, passed the
+interactive privacy gate and the exact-amount second consent, and was signed
+and stored locally with SDK-generated transaction ID
+`1b69288d5e91a57a038c3d5c48728cb8f760644feb2670f581ea61a83807e337`.
+No secret or recovery material was placed in this repository.
+
+The first signed transaction (`b00c6900b9f55a1b9d05fa6103d7972d5a6ff8030033de584cad73cd0b4f53bd`)
+expired unbroadcast; wallet synchronization reconciled the reserved funds
+back to 1.00000000 spendable TAZ. The standalone broadcaster refused that
+expired transaction (`expiry 4,544,405` vs tip `4,544,670`).
+
+The replacement transaction was rejected by public testnet relay at height
+4,544,671 (`-25`, incorrect consensus branch ID), **not accepted or mined**.
+The pinned `zcash_protocol 0.10.5` library selects `Nu6_3` on testnet height
+4,544,675 because its network activation table still has no NU7 activation.
+NU7 activated on public testnet at **height 4,465,026** in October 2026.
+Therefore, the broadcaster now **fails closed before network submission**
+when the tip is on NU7. An updated, compatible consensus/wallet SDK and a
+fresh signed transaction are required. Never alter a signed transaction's
+branch ID or claim its broadcast succeeded.
+
 ## Unverified and still required
 
-- [ ] A funded, wallet-backed Zcash proposal and complete signing execution through the gate.
-- [ ] Testnet broadcast or confirmation (if attempted, never use production funds).
+- [x] A funded, wallet-backed Zcash proposal and complete signing execution through the gate.
+- [ ] SDK update for NU7 testnet and fresh, compatible signing.
+- [ ] Testnet broadcast and confirmation (never use production funds).
 - [ ] An actually recorded two-minute video and its final accessible link.
 - [ ] Final hackathon submission URL, submitted source SHA, and confirmation receipt.
 
-**Important:** The repository contains real SDK proposal structures and an optional compile-checked signing integration, but no end-to-end funded wallet send has been demonstrated. The live CLI uses synthetic unspendable fixtures and a no-op callback. Do not present test or compile evidence as a completed network transaction.
+**Important:** The CLI demonstrates a real funded wallet proposal and locally completed signing, but **not a successful testnet broadcast or confirmation**. The synthetic fixture-based demo remains a separate no-op path. The NU7-compatible SDK upgrade is required before claiming end-to-end network success.
