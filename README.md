@@ -45,13 +45,14 @@ cargo +1.95.0 clippy --workspace --all-targets -- -D warnings
 
 These are **verification commands, not a statement that this checkout currently passes**. Record fresh command output and exit status before claiming green CI.
 
-The following non-signing CLI command has been verified on the development laptop:
+Two interactive, non-signing CLI paths have been verified on the Ubuntu development laptop:
 
 ```bash
-cargo +1.95.0 run --bin leaklens-demo
+cargo +1.95.0 run --bin leaklens-demo -- --shielded
+cargo +1.95.0 run --bin leaklens-demo -- --transparent
 ```
 
-Type `CONTINUE` to reach the harmless review callback or `REVISE` to cancel. It does **not** sign, fund, or broadcast a payment.
+The shielded fixture presents no findings under the implemented rules and accepts `CONTINUE` or `REVISE`. The transparent fixture displays `LL-002` (public funding inputs) and `LL-001` (public recipient and value), requiring `ACKNOWLEDGE` to proceed or `REVISE` to cancel. Both reach at most a **NO-OP CALLBACK**—neither signs, funds, nor broadcasts a payment.
 
 See [Demo walkthrough](docs/demo.md), [Privacy model](docs/privacy-model.md), and [Submission proof checklist](docs/submission-checklist.md).
 
