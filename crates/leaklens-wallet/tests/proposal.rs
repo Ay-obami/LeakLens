@@ -34,9 +34,7 @@ fn zero_value_is_rejected_before_attempting_note_selection() {
     let directory = tempfile::tempdir().expect("temporary wallet directory");
     let mut wallet =
         open_testnet_wallet(&directory.path().join("wallet.sqlite")).expect("wallet DB bootstrap");
-    let destination = Address::Transparent(
-        TransparentAddress::PublicKeyHash([0x22; 20])
-    );
+    let destination = Address::Transparent(TransparentAddress::PublicKeyHash([0x22; 20]));
 
     let failure = propose_testnet_transfer(
         &mut wallet,
