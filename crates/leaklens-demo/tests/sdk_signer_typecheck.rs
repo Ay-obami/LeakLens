@@ -9,7 +9,6 @@ use leaklens_demo::{PendingZcashReview, execute_reviewed_zcash_signing};
 use sapling::prover::{OutputProver, SpendProver};
 use zcash_client_backend::{
     data_api::{WalletCommitmentTrees, WalletWrite, wallet::SpendingKeys},
-    wallet::OvkPolicy,
 };
 use zcash_protocol::consensus::Parameters;
 
@@ -22,7 +21,6 @@ fn real_sdk_signer_signature_must_compile<DbT, ParamsT, N>(
     spend_prover: &impl SpendProver,
     output_prover: &impl OutputProver,
     spending_keys: &SpendingKeys,
-    ovk_policy: OvkPolicy,
 ) where
     DbT: WalletWrite + WalletCommitmentTrees,
     ParamsT: Parameters + Clone,
@@ -35,7 +33,6 @@ fn real_sdk_signer_signature_must_compile<DbT, ParamsT, N>(
         spend_prover,
         output_prover,
         spending_keys,
-        ovk_policy,
     );
 }
 
