@@ -1,0 +1,10 @@
+[package]
+name = "leaklens-gate"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Proposal-bound pre-authorization privacy gate for Zcash wallets"
+
+[dependencies]
+sha2 = "0.10"
+leaklens-core = { path = "../leaklens-core" }
