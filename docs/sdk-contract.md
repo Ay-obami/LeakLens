@@ -2,7 +2,7 @@
 
 - Toolchain: Rust 1.95.0, edition 2024.
 - Pin: `zcash_client_backend = 0.24.0` with `orchard` and `transparent-inputs`.
-- Matching crates: `zcash_protocol = 0.10.5`, `zcash_primitives = 0.30.1`, `zcash_address = 0.13.0`, `zip321 = 0.9.0`, `orchard = 0.15.0`, `zip32 = 0.2`.
+- Matching crates: `zcash_protocol = 0.10.5`, `zcash_primitives = 0.30.1`, `zcash_address = 0.13.0`, `zip321 = 0.9.0`, `orchard = 0.15.5`, `zip32 = 0.2`, `zcash_keys = 0.16.1`.
 - Source SDK proposal type: `zcash_client_backend::proposal::Proposal<FeeRuleT, NoteRef>`.
 - Inspect all `proposal.steps()`. For each `Step`, inspect `transaction_request()`, `payment_pools()`, `transparent_inputs()`, `shielded_inputs()`, `balance().proposed_change()`, and `prior_step_inputs()`.
 - Selected destination value pool is `step.payment_pools()[payment_index]`, **not** the address prefix.
