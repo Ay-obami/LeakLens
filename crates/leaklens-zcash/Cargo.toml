@@ -13,4 +13,5 @@ zcash_address.workspace = true
 zip321.workspace = true
 orchard.workspace = true
 zip32.workspace = true
+zcash_keys.workspace = true
 
