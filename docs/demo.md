@@ -30,7 +30,30 @@
 
 ## Verified CLI demonstration
 
-Run `cargo +1.95.0 run --bin leaklens-demo` and type `CONTINUE` to reach the protected **NO-OP CALLBACK** or `REVISE` to exit. The executable was tested on the Ubuntu development laptop. The proposal is a real SDK-validated *structure* and its complete standard-proposal Protobuf is fingerprinted twice, but it has no spendable wallet inputs. This demonstration does not sign or broadcast.
+The two paths below were run on the Ubuntu development laptop on October 26, 2026. They construct valid SDK proposal *structures* but do not use spendable wallet funds.
+
+### Path A — transparent payment triggers warnings
+
+```bash
+cargo +1.95.0 run --bin leaklens-demo -- --transparent
+```
+
+Expected visible findings:
+
+- `LL-002 [PUBLIC DISCLOSURE]`: transparent funding inputs and their public history are observable.
+- `LL-001 [PUBLIC DISCLOSURE]`: transparent recipient and payment amount are public.
+
+Enter `REVISE` to abort. Repeat and enter `ACKNOWLEDGE` to reach `NO-OP CALLBACK REACHED — NOT SIGNING OR BROADCASTING`. This is a demo of risk acknowledgment, not payment authorization.
+
+### Path B — shielded-only proposal
+
+```bash
+cargo +1.95.0 run --bin leaklens-demo -- --shielded
+```
+
+The fixture produces `No known exposure was flagged by this policy`. The wording is deliberately narrower than an anonymity guarantee. Enter `CONTINUE` to reach the same NO-OP callback, or `REVISE` to abort.
+
+Both paths fingerprint the complete standard-proposal SDK Protobuf and check it before entering the protected callback. They do not sign, persist, or broadcast a transaction.
 
 ## Evidence to capture
 
