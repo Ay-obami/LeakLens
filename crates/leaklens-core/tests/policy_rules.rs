@@ -90,6 +90,22 @@ fn empty_proposal_is_incomplete() {
 }
 
 #[test]
+fn empty_step_is_incomplete_even_when_sdk_constructs_it() {
+    let facts = ProposalFacts {
+        steps: vec![StepFacts {
+            payments: vec![],
+            has_transparent_inputs: false,
+            has_shielded_inputs: false,
+            has_prior_shielded_funding: false,
+            change_pools: vec![],
+        }],
+    };
+    let result = assess(&facts, &Policy::default());
+    assert!(!result.complete);
+    assert!(result.findings.iter().any(|finding| finding.code == "LL-005"));
+}
+
+#[test]
 fn transparent_change_warns() {
     let mut facts = proposal(payment(RecipientKind::Shielded, PoolKind::Orchard), false, true);
     facts.steps[0].change_pools = vec![PoolKind::Transparent];
