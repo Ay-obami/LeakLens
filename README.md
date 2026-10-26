@@ -4,7 +4,7 @@
 
 LeakLens examines the destination pool, transparent inputs, shielded inputs, change pools, and available proposal metadata before a wallet proceeds with authorization. It presents concrete public disclosures separately from *possible* privacy correlations, so users can reconsider a payment route before committing to it.
 
-> **Development status (October 26, 2026):** The project is a hackathon prototype. The current demo crate exposes a library-level `preview_review` interface and tests, not a released CLI or consumer-wallet integration. SDK proposal fixtures are structural; a funded transaction, completed authorization/signature, and network broadcast have **not** been demonstrated. Do not use the prototype to protect real funds.
+> **Development status (October 26, 2026):** The project is a hackathon prototype with a runnable, explicitly non-signing CLI and SDK-backed tests. SDK proposal fixtures are structural; a funded transaction, completed wallet signature, and network broadcast have **not** been demonstrated. Do not use the prototype to protect real funds.
 
 ## What LeakLens checks
 
@@ -24,7 +24,7 @@ The policy is deliberately conservative. “No findings” means none of these *
 1. `leaklens-zcash`: translate official `librustzcash` proposal structures into explicitly typed facts.
 2. `leaklens-core`: run deterministic privacy rules without handling spending keys.
 3. `leaklens-gate`: bind a review/acknowledgment to the exact proposal and policy version; reject mismatched or incomplete decisions.
-4. `leaklens-demo`: present a review with the current `preview_review` library API.
+4. `leaklens-demo`: run an SDK-fixture CLI review and verify the same proposal fingerprint before a **no-op**, non-signing callback.
 
 The intended wallet integration point is **after proposal generation but before authorization**. The harness must route every authorization path through the gate for that guarantee to hold; installing a library alone does not intercept other wallets.
 
@@ -45,7 +45,13 @@ cargo +1.95.0 clippy --workspace --all-targets -- -D warnings
 
 These are **verification commands, not a statement that this checkout currently passes**. Record fresh command output and exit status before claiming green CI.
 
-There is currently **no verified `leaklens-demo` command-line binary**. Do not use `cargo run -p leaklens-demo` as a submission instruction until an executable target and documented flags exist.
+The following non-signing CLI command has been verified on the development laptop:
+
+```bash
+cargo +1.95.0 run --bin leaklens-demo
+```
+
+Type `CONTINUE` to reach the harmless review callback or `REVISE` to cancel. It does **not** sign, fund, or broadcast a payment.
 
 See [Demo walkthrough](docs/demo.md), [Privacy model](docs/privacy-model.md), and [Submission proof checklist](docs/submission-checklist.md).
 
