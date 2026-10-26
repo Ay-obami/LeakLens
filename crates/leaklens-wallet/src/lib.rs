@@ -4,3 +4,5 @@
 //! Transaction synchronization and proposal generation are separate concerns.
 
 pub mod storage;
+
+pub mod proposal;
