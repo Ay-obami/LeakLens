@@ -891,6 +891,15 @@ name = "leaklens-core"
 version = "0.1.0"
 
 [[package]]
+name = "leaklens-demo"
+version = "0.1.0"
+dependencies = [
+ "leaklens-core",
+ "leaklens-gate",
+ "leaklens-zcash",
+]
+
+[[package]]
 name = "leaklens-gate"
 version = "0.1.0"
 dependencies = [
