@@ -19,3 +19,4 @@ zip32.workspace = true
 zcash_keys.workspace = true
 
 [dev-dependencies]
+nonempty = "=0.11.0"
