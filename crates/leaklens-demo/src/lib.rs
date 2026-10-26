@@ -14,6 +14,7 @@ use leaklens_zcash::fixture::{sample_shielded_proposal, sample_transparent_propo
 mod bridge;
 mod sdk_signer;
 pub use bridge::{InspectError, PendingZcashReview};
+pub mod wallet_flow;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PreviewOutcome {
