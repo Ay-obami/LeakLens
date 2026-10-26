@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use leaklens_demo::{run_sdk_fixture_demo, DemoStatus};
+use leaklens_demo::{run_sdk_fixture_demo, run_sdk_fixture_demo_mode, DemoFixture, DemoStatus};
 
 #[test]
 fn real_sdk_fixture_passes_through_adapter_review_and_noop_gate() {
@@ -28,4 +28,34 @@ fn no_fixture_signing_or_broadcast_claim_appears() {
     let text = String::from_utf8(output).unwrap();
     assert!(!text.contains("Transaction signed successfully"));
     assert!(!text.contains("Broadcast successful"));
+}
+
+#[test]
+fn sdk_transparent_payment_discloses_public_fields_and_requires_acknowledgment() {
+    let mut output = Vec::new();
+    let outcome = run_sdk_fixture_demo_mode(
+        Cursor::new(b"ACKNOWLEDGE\n"),
+        &mut output,
+        DemoFixture::Transparent,
+    )
+    .expect("SDK fixture review succeeds");
+    let transcript = String::from_utf8(output).unwrap();
+    assert_eq!(outcome, DemoStatus::NoopReached);
+    assert!(transcript.contains("LL-001"));
+    assert!(transcript.contains("LL-002"));
+    assert!(transcript.contains("PUBLIC DISCLOSURE"));
+    assert!(transcript.contains("NO-OP CALLBACK REACHED"));
+}
+
+#[test]
+fn sdk_transparent_payment_cannot_continue_without_acknowledgment() {
+    let mut output = Vec::new();
+    let outcome = run_sdk_fixture_demo_mode(
+        Cursor::new(b"CONTINUE\n"),
+        &mut output,
+        DemoFixture::Transparent,
+    )
+    .expect("denial is a normal user choice");
+    assert_eq!(outcome, DemoStatus::Cancelled);
+    assert!(!String::from_utf8(output).unwrap().contains("NO-OP CALLBACK REACHED"));
 }
