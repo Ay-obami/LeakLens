@@ -1,0 +1,8 @@
+[package]
+name = "leaklens-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Pure policy engine for Zcash transaction proposal privacy checks"
+
+[dependencies]
