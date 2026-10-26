@@ -6,12 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+leaklens-core = { path = "../leaklens-core" }
 zcash_client_backend.workspace = true
 zcash_protocol.workspace = true
 zcash_primitives.workspace = true
 zcash_address.workspace = true
+zcash_transparent = "=0.10.0"
 zip321.workspace = true
 orchard.workspace = true
 zip32.workspace = true
 zcash_keys.workspace = true
 
+[dev-dependencies]
