@@ -11,7 +11,7 @@ use orchard::tree::MerkleHashOrchard;
 use prost::Message;
 use rusqlite::{Connection, params};
 use sapling::Node;
-use tonic::transport::{Channel, Endpoint};
+use tonic::transport::Channel;
 use zcash_client_backend::{
     data_api::{
         WalletCommitmentTrees, WalletRead, WalletWrite,
@@ -132,13 +132,9 @@ pub async fn sync_testnet_wallet(
     cache_path: &Path,
     config: &SyncConfig,
 ) -> Result<SyncReport> {
-    let endpoint = Endpoint::from_shared(config.endpoint.clone())
-        .context("parsing TLS lightwalletd endpoint")?;
-    let channel: Channel = endpoint
-        .connect()
+    let mut client = CompactTxStreamerClient::connect(config.endpoint.clone())
         .await
-        .context("connecting to lightwalletd")?;
-    let mut client = CompactTxStreamerClient::new(channel);
+        .context("connecting to TLS lightwalletd")?;
 
     let info = client
         .get_lightd_info(service::Empty::default())
