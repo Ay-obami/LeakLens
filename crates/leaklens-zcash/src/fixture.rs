@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use orchard::{keys::FullViewingKey, keys::SpendingKey};
-use zcash_address::unified::Address as UnifiedAddress;
+use zcash_keys::address::UnifiedAddress;
 use zcash_client_backend::{
     address::Address,
     data_api::wallet::ConfirmationsPolicy,
