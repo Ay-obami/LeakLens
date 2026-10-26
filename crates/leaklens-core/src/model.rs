@@ -27,6 +27,9 @@ pub struct StepFacts {
     pub payments: Vec<PaymentFacts>,
     pub has_transparent_inputs: bool,
     pub has_shielded_inputs: bool,
+    /// The adapter has established that this step is funded by a shielded
+    /// output from an earlier step of the same proposal.
+    pub has_prior_shielded_funding: bool,
     pub change_pools: Vec<PoolKind>,
 }
 
