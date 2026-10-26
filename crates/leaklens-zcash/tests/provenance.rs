@@ -159,7 +159,7 @@ fn prior_transparent_payment_is_recognized_as_transparent_funding() {
     .expect("first step");
 
     let second = Step::<u32>::from_parts(
-        &[first.clone()],
+        std::slice::from_ref(&first),
         request(50_000),
         output_pools(),
         vec![],
@@ -209,7 +209,7 @@ fn prior_ephemeral_change_is_recognized_as_transparent_funding() {
     .expect("first step with ephemeral transparent change");
 
     let second = Step::<u32>::from_parts(
-        &[first.clone()],
+        std::slice::from_ref(&first),
         request(20_000),
         output_pools(),
         vec![],
