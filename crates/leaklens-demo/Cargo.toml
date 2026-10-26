@@ -5,12 +5,14 @@ edition = "2024"
 license = "MIT"
 
 [dependencies]
+anyhow = "1"
 leaklens-core = { path = "../leaklens-core" }
 leaklens-gate = { path = "../leaklens-gate" }
 leaklens-zcash = { path = "../leaklens-zcash" }
+leaklens-wallet = { path = "../leaklens-wallet" }
 zcash_client_backend = "=0.24.0"
+zcash_keys = "=0.16.1"
+zcash_protocol = "=0.10.5"
 
 [dev-dependencies]
 sapling = { package = "sapling-crypto", version = "0.7" }
-zcash_protocol = "=0.10.5"
-leaklens-wallet = { path = "../leaklens-wallet" }
