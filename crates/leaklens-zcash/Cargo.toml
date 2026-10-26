@@ -7,6 +7,7 @@ license.workspace = true
 
 [dependencies]
 leaklens-core = { path = "../leaklens-core" }
+prost = "=0.14.4"
 zcash_client_backend.workspace = true
 zcash_protocol.workspace = true
 zcash_primitives.workspace = true
