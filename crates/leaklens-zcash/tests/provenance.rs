@@ -75,7 +75,7 @@ fn balance_with_transparent_change() -> TransactionBalance {
 
 #[test]
 fn sdk_transparent_change_is_reported_as_transparent() {
-    let proposal = Proposal::single_step(
+    let proposal: Proposal<(), u32> = Proposal::single_step(
         request(PAID_VALUE),
         output_pools(),
         vec![funding_input()],
@@ -114,7 +114,7 @@ fn sdk_rejects_payment_without_a_selected_pool() {
 
 #[test]
 fn sdk_rejects_forward_or_nonexistent_prior_step_reference() {
-    let invalid = Step::<u32>::from_parts(
+    let proposed_step = Step::<u32>::from_parts(
         &[],
         request(PAID_VALUE),
         output_pools(),
@@ -126,7 +126,17 @@ fn sdk_rejects_forward_or_nonexistent_prior_step_reference() {
         false,
         false,
     );
-    assert!(invalid.is_err(), "invalid reference must not become a supposedly safe proposal");
+    // Depending on where SDK validation runs, this can fail either while
+    // constructing the step or while assembling the full proposal.
+    if let Ok(step) = proposed_step {
+        let proposal = Proposal::multi_step(
+            (),
+            TargetHeight::from(BlockHeight::from_u32(101)),
+            ConfirmationsPolicy::default(),
+            NonEmpty::singleton(step),
+        );
+        assert!(proposal.is_err(), "invalid reference must not become a valid proposal");
+    }
 }
 
 #[test]
