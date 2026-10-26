@@ -1,0 +1,27 @@
+name: Rust verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+          components: clippy
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+      - name: Run all workspace tests
+        run: cargo +1.95.0 test --workspace
+      - name: Strict Clippy
+        run: cargo +1.95.0 clippy --workspace --all-targets -- -D warnings
