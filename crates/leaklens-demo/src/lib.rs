@@ -12,6 +12,7 @@ use leaklens_core::Policy;
 use leaklens_zcash::fixture::{sample_shielded_proposal, sample_transparent_proposal};
 
 mod bridge;
+mod sdk_signer;
 pub use bridge::{InspectError, PendingZcashReview};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

@@ -10,3 +10,6 @@ leaklens-gate = { path = "../leaklens-gate" }
 leaklens-zcash = { path = "../leaklens-zcash" }
 zcash_client_backend = "=0.24.0"
 
+[dev-dependencies]
+sapling = { package = "sapling-crypto", version = "0.7" }
+zcash_protocol = "=0.10.5"
