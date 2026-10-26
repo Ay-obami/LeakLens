@@ -887,6 +887,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "leaklens-core"
+version = "0.1.0"
+
+[[package]]
+name = "leaklens-gate"
+version = "0.1.0"
+dependencies = [
+ "leaklens-core",
+ "sha2 0.10.9",
+]
+
+[[package]]
 name = "leaklens-zcash"
 version = "0.1.0"
 dependencies = [
