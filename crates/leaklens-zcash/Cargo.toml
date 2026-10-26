@@ -1,0 +1,15 @@
+[package]
+name = "leaklens-zcash"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+
+[dependencies]
+leaklens-core = { path = "../leaklens-core" }
+zcash_client_backend = { version = "=0.24.0", features = ["orchard", "transparent-inputs"] }
+zcash_keys = { version = "0.16", features = ["sapling", "orchard"] }
+zcash_protocol = "0.10"
+zcash_transparent = "0.10"
+
+[dev-dependencies]
+zip321 = "0.9"
