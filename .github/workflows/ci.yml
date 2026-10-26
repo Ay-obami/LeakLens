@@ -21,6 +21,8 @@ jobs:
           components: clippy, rustfmt
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
+      - name: Run focused wallet proposal contract tests
+        run: cargo +1.95.0 test -p leaklens-wallet --test proposal
       - name: Run all workspace tests
         run: cargo +1.95.0 test --workspace
       - name: Check Rustfmt
