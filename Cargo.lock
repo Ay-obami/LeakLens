@@ -915,6 +915,7 @@ name = "leaklens-zcash"
 version = "0.1.0"
 dependencies = [
  "leaklens-core",
+ "leaklens-gate",
  "nonempty",
  "orchard",
  "prost",
