@@ -8,3 +8,5 @@ pub mod storage;
 pub mod proposal;
 
 pub mod sync;
+
+pub mod setup;
