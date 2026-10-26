@@ -34,7 +34,7 @@ fn transparent_sdk_proposal() -> Proposal<(), u32> {
     let request = TransactionRequest::new(vec![
         Payment::new(
             recipient.to_zcash_address(&Network::TestNetwork),
-            Some(Zatoshis::const_from_u64(0)),
+            Some(Zatoshis::const_from_u64(1)),
             None,
             None,
             None,
@@ -79,5 +79,5 @@ fn extracts_transparent_recipient_from_selected_sdk_pool() {
     let payment = &facts.steps[0].payments[0];
     assert_eq!(payment.recipient_kind, RecipientKind::Transparent);
     assert_eq!(payment.selected_pool, PoolKind::Transparent);
-    assert_eq!(payment.amount_zat, 0);
+    assert_eq!(payment.amount_zat, 1);
 }
