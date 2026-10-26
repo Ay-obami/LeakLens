@@ -14,13 +14,13 @@
 
 | Time | On-screen evidence | Narration purpose |
 |---|---|---|
-| 0–15s | Title + one-sentence problem | A Zcash payment path can reveal fields the user expected to keep private |
-| 15–35s | SDK proposal fixture and test invocation | Inspection occurs on an actual typed SDK proposal structure, before any hypothetical authorization |
-| 35–60s | Transparent output test and `LL-001` | Show what is public: recipient and value |
-| 60–75s | Shielded-funding crossing and `LL-003` | State correlation is possible, never proven identity tracing |
-| 75–90s | Unified receiver selection and transparent change tests | Show selected pool and change are checked, not just address prefix |
-| 90–105s | `LL-005` incomplete review / stale approval test | Explain why unsupported or changed proposals must not receive a clean approval |
-| 105–120s | Architecture summary + repository/limitations | Explain what is implemented and what remains for production use |
+| 0–15s | Title + two-sentence problem and solution | A Zcash payment route can unexpectedly expose public information; LeakLens reviews SDK proposals before wallet authorization |
+| 15–40s | Run `--transparent` | Show **actual** CLI findings `LL-001` and `LL-002` on the typed SDK fixture |
+| 40–60s | Enter `CONTINUE` on that warning | Show that skipping the explicit `ACKNOWLEDGE` token does **not** authorize the callback |
+| 60–80s | Rerun `--transparent`, enter `ACKNOWLEDGE` | The guarded **NO-OP CALLBACK** is reached; this is **not** signing |
+| 80–100s | Run `--shielded`, enter `CONTINUE` | The implemented policy flags no known exposure for that fixture, without guaranteeing anonymity |
+| 100–115s | Show named tests for `LL-003`, `LL-004`, `LL-005`, `LL-007`, proposal tampering | These additional cases are **test output, not CLI demo modes** |
+| 115–120s | Repository + limitations | No funded wallet, actual signing, or network broadcast has been demonstrated |
 
 ## Example presentation language
 
