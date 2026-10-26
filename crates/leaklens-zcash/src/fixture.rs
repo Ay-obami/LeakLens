@@ -20,9 +20,9 @@ use zip321::{Payment, TransactionRequest};
 pub fn sample_shielded_proposal() -> Proposal<FeeRule, u32> {
     let spending_key = SpendingKey::from_bytes([7; 32]).expect("test key");
     let receiver = FullViewingKey::from(&spending_key).address_at(0u32, zip32::Scope::External);
-    let unified = UnifiedAddress::from_receivers(Some(receiver), None, None, None, None)
+    let unified = UnifiedAddress::from_receivers(Some(receiver), None, None)
         .expect("test unified address");
-    let address = Address::Unified(Box::new(unified)).to_zcash_address(&Network::TestNetwork);
+    let address = Address::Unified(unified).to_zcash_address(&Network::TestNetwork);
     let payment = Payment::new(address, Some(Zatoshis::ZERO), None, None, None, vec![])
         .expect("zero-value test payment");
     let request = TransactionRequest::new(vec![payment]).expect("valid request");
