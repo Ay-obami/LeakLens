@@ -18,6 +18,26 @@ This is a snapshot of the implementation's **test and demonstration evidence**, 
 
 The SDK signer typecheck harness is compiled by workspace tests but **is never called**. Its compilation confirms SDK function signature compatibility only, not a successful signature, spend or broadcast.
 
+## Wallet integration sprint — 2026-10-26
+
+[Draft PR #23](https://github.com/Ay-obami/LeakLens/pull/23) introduced a
+persistent testnet SQLite wallet (`zcash_client_sqlite 0.22.0`), caller-owned
+account import, shielded-only addresses, actual SDK wallet-backed transfer
+proposal selection, and an explicit approval boundary around the exact proposal.
+
+**Verified commit:** `e4a1f0139cb47cb0b9902f8d0792aa8b164bd06f`  
+**GitHub Actions:** [40313168982](https://github.com/Ay-obami/LeakLens/actions/runs/40313168982)
+
+- PASS: Rustfmt, entire workspace test suite, strict Clippy.
+- PASS: persistent wallet database tests and unfunded proposal rejection.
+- PASS: reviewed SDK fixture cannot enter guarded execution without the appropriate approval.
+- NOT VERIFIED: concrete SQLite note-reference signer execution or funded testnet send.
+- NOT VERIFIED: network synchronization, subtree roots, reorg recovery, broadcast and confirmation.
+
+The signer macro remains typechecked generically, but it is not yet exercised
+with actual SQLite wallet state. This is an incremental integration milestone;
+Issue #5 must remain open until a real wallet-backed end-to-end path is verified.
+
 ## Live CLI commands tested on Ubuntu
 
 ```bash
