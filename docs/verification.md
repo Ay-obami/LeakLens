@@ -34,8 +34,20 @@ proposal selection, and an explicit approval boundary around the exact proposal.
 - NOT VERIFIED: concrete SQLite note-reference signer execution or funded testnet send.
 - NOT VERIFIED: network synchronization, subtree roots, reorg recovery, broadcast and confirmation.
 
-The signer macro remains typechecked generically, but it is not yet exercised
-with actual SQLite wallet state. This is an incremental integration milestone;
+The signer macro is now compile-tested with the concrete SQLite wallet and
+its real received-note reference type. This checks compatibility but never
+executes a signer or handles spending keys.
+
+**Second verified integration commit:** `b16ddc60acd817b492f7bca8dc8b61aa7d82755a`  
+**CI:** [40314477035](https://github.com/Ay-obami/LeakLens/actions/runs/40314477035)
+— Rustfmt, all workspace tests, and strict Clippy PASS.
+
+The compiled sync module performs TLS lightwalletd testnet checks, bounded
+compact-block fetch/cache/scan, and Sapling/Orchard subtree-root insertion.
+However, **live testnet synchronization is not yet demonstrated**. Chain
+reorganizations are reported as failures rather than safely recovered, and
+the lightwalletd operator learns connection IP and query metadata.
+ This is an incremental integration milestone;
 Issue #5 must remain open until a real wallet-backed end-to-end path is verified.
 
 ## Live CLI commands tested on Ubuntu
