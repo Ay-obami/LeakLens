@@ -23,8 +23,12 @@ fn main() -> Result<()> {
     let destination = db
         .get_last_generated_address_matching(accounts[0], UnifiedAddressRequest::SHIELDED)?
         .context("shielded address not found")?;
-    let proposal =
-        propose_testnet_transfer(&mut db, accounts[0], &Address::Unified(destination), amount)?;
+    let proposal = propose_testnet_transfer(
+        &mut db,
+        accounts[0],
+        &Address::Unified(Box::new(destination)),
+        amount,
+    )?;
     println!("Proposal created without signing or broadcasting");
     println!("Requested self-transfer zatoshis: {:?}", amount);
     println!("Proposal steps: {}", proposal.steps().len());
