@@ -8,10 +8,10 @@ use leaklens_core::Policy;
 use leaklens_demo::{PendingZcashReview, execute_reviewed_zcash_signing};
 use leaklens_wallet::storage::TestnetWalletDb;
 use sapling::prover::{OutputProver, SpendProver};
-use zcash_client_backend::data_api::{WalletRead, wallet::SpendingKeys};
+use zcash_client_backend::data_api::{InputSource, wallet::SpendingKeys};
 use zcash_protocol::consensus::Network;
 
-type SqliteNoteRef = <TestnetWalletDb as WalletRead>::NoteRef;
+type SqliteNoteRef = <TestnetWalletDb as InputSource>::NoteRef;
 
 #[allow(dead_code, clippy::too_many_arguments)]
 fn sqlite_wallet_signing_boundary_typechecks(
