@@ -1,6 +1,6 @@
 # LeakLens — Two-Minute Demo Walkthrough
 
-**Status:** Script and verification storyboard. Capture only steps actually implemented and reproduced. The current `leaklens-demo` crate exposes a library function `preview_review`, not a confirmed interactive executable. Do not stage terminal screenshots or voiceover suggesting a real spend/signature occurred.
+**Status:** Script and verification storyboard. The current `leaklens-demo` crate has a verified interactive executable using a non-spendable SDK fixture. Do not suggest a real spend/signature occurred.
 
 ## Preflight
 
@@ -28,9 +28,9 @@
 
 “The current prototype demonstrates the rule engine and pre-authorization review interface through tests. It has not demonstrated a funded network transaction or completed signing.”
 
-## CLI demonstration gate
+## Verified CLI demonstration
 
-The present build is a **library-level** demonstration. If an executable is subsequently added, update this document with the precise `cargo run -p leaklens-demo -- <documented subcommand>` invocation **only after running it**. Until then, use targeted tests and source-backed preview output; do not invent interactive commands.
+Run `cargo +1.95.0 run --bin leaklens-demo` and type `CONTINUE` to reach the protected **NO-OP CALLBACK** or `REVISE` to exit. The executable was tested on the Ubuntu development laptop. The proposal is a real SDK-validated *structure* and its complete standard-proposal Protobuf is fingerprinted twice, but it has no spendable wallet inputs. This demonstration does not sign or broadcast.
 
 ## Evidence to capture
 
