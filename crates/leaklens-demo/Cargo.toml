@@ -8,3 +8,5 @@ license = "MIT"
 leaklens-core = { path = "../leaklens-core" }
 leaklens-gate = { path = "../leaklens-gate" }
 leaklens-zcash = { path = "../leaklens-zcash" }
+zcash_client_backend = "=0.24.0"
+
