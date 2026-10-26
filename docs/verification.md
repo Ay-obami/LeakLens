@@ -50,6 +50,30 @@ the lightwalletd operator learns connection IP and query metadata.
  This is an incremental integration milestone;
 Issue #5 must remain open until a real wallet-backed end-to-end path is verified.
 
+## Live disposable testnet wallet checkpoint — 2026-10-26
+
+**Environment:** Authorized Ubuntu laptop; dedicated verification clone and
+private wallet directory. **Network:** Zcash testnet via a TLS lightwalletd.
+
+- The wallet initializer compiled and connected to `https://testnet.zec.rocks:443`.
+- An age-encrypted, 32-byte random recovery seed was created locally, without
+  writing plaintext to disk or printing key material. The age identity,
+  encrypted seed and SQLite databases are stored in a private `0700` directory.
+  Individual file permissions were verified/secured at `0600`.
+- The wallet was initialized with a tree-state birthday 100 blocks behind the
+  tip, and a shielded-only `utest1...` receiving address was generated.
+- The real lightwalletd synchronizer reported **tip 4,544,285** and
+  **100 compact blocks scanned** on its first successful bounded run.
+- The TLS connection fix was committed as
+  `411027a4a7228bb089067436d19708864f414ec4`.
+- No testnet funds have been received, no wallet-backed funded proposal was
+  constructed, and no signing or broadcasting was performed.
+
+The local encryption identity must be backed up securely by the owner before
+funding. Disclosure or loss of that identity together with the encrypted seed
+can compromise recoverability; never commit these files to Git or send them to
+support services. Live sync success does not establish reorg-recovery quality.
+
 ## Live CLI commands tested on Ubuntu
 
 ```bash
