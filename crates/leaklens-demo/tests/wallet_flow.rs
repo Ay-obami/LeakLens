@@ -57,7 +57,10 @@ fn acknowledged_transparent_payment_delivers_exact_proposal_to_authorized_callba
         Ok::<_, ()>("guarded callback")
     });
 
-    assert_eq!(callback_result.expect("consumed gate approves"), "guarded callback");
+    assert_eq!(
+        callback_result.expect("consumed gate approves"),
+        "guarded callback"
+    );
     assert_eq!(callback_count.get(), 1);
 }
 
