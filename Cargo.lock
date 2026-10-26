@@ -1322,12 +1322,14 @@ version = "0.1.0"
 name = "leaklens-demo"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "leaklens-core",
  "leaklens-gate",
  "leaklens-wallet",
  "leaklens-zcash",
  "sapling-crypto",
  "zcash_client_backend",
+ "zcash_keys",
  "zcash_protocol",
 ]
 
