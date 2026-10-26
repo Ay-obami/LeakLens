@@ -1,0 +1,10 @@
+[package]
+name = "leaklens-demo"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+leaklens-core = { path = "../leaklens-core" }
+leaklens-gate = { path = "../leaklens-gate" }
+
