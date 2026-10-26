@@ -37,7 +37,10 @@ pub fn propose_testnet_transfer(
     destination: &Address,
     amount: Zatoshis,
 ) -> Result<WalletTransferProposal> {
-    ensure!(amount.is_positive(), "payment amount must be greater than zero");
+    ensure!(
+        amount.is_positive(),
+        "payment amount must be greater than zero"
+    );
     propose_standard_transfer_to_address::<_, _, std::convert::Infallible>(
         wallet_db,
         &Network::TestNetwork,
@@ -53,6 +56,8 @@ pub fn propose_testnet_transfer(
         None,
     )
     .map_err(|error| {
-        anyhow!("testnet proposal failed (wallet sync and funded shielded notes required): {error:?}")
+        anyhow!(
+            "testnet proposal failed (wallet sync and funded shielded notes required): {error:?}"
+        )
     })
 }
