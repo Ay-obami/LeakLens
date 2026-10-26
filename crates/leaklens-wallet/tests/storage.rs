@@ -7,7 +7,10 @@ fn testnet_wallet_storage_is_persistent_and_reopenable() {
     assert!(!path.exists());
 
     let first = open_testnet_wallet(&path).expect("initialize testnet wallet DB");
-    assert!(path.exists(), "SQLite backend should create a real database");
+    assert!(
+        path.exists(),
+        "SQLite backend should create a real database"
+    );
     drop(first);
 
     let reopened = open_testnet_wallet(&path).expect("reopening must be idempotent");
