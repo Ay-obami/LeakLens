@@ -9,11 +9,10 @@ use std::io::{self, BufRead, Write};
 use leaklens_core::Certainty;
 use leaklens_gate::{GateDecision, GateReview};
 use leaklens_core::Policy;
-use leaklens_zcash::{
-    encode_canonical_standard_proposal,
-    extract_proposal_facts,
-    fixture::{sample_shielded_proposal, sample_transparent_proposal},
-};
+use leaklens_zcash::fixture::{sample_shielded_proposal, sample_transparent_proposal};
+
+mod bridge;
+pub use bridge::{InspectError, PendingZcashReview};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PreviewOutcome {
@@ -118,28 +117,20 @@ pub fn run_sdk_fixture_demo_mode(
         DemoFixture::Shielded => sample_shielded_proposal(),
         DemoFixture::Transparent => sample_transparent_proposal(),
     };
-    let facts = extract_proposal_facts(&proposal)
-        .map_err(|error| io::Error::other(format!("SDK adapter could not inspect proposal: {error:?}")))?;
     let policy = Policy::default();
-
-    let proposal_bytes = encode_canonical_standard_proposal(&proposal);
-    let mut review = GateReview::inspect(&facts, &policy, &proposal_bytes)
-        .map_err(|error| io::Error::other(format!("Gate inspection failed: {error:?}")))?;
+    let mut pending = PendingZcashReview::inspect(&proposal, policy)
+        .map_err(|error| io::Error::other(format!("SDK proposal review failed: {error:?}")))?;
 
     writeln!(output, "DEMONSTRATION ONLY: SDK-validated proposal with full SDK protobuf fingerprint.")?;
     writeln!(output, "NOT SIGNING. No wallet credentials or broadcasting are involved.")?;
-    match preview_review(&mut review, input, output)? {
+    match preview_review(pending.review_mut(), input, output)? {
         PreviewOutcome::Abort | PreviewOutcome::ReviseProposal => Ok(DemoStatus::Cancelled),
         PreviewOutcome::ProceedToWallet => {
-            review
-                .authorize_and_execute(
-                    &policy,
-                    || Ok::<Vec<u8>, io::Error>(encode_canonical_standard_proposal(&proposal)),
-                    || {
+            pending
+                .execute(&policy, |_same_borrowed_sdk_proposal| {
                         writeln!(output, "NO-OP CALLBACK REACHED — NOT SIGNING OR BROADCASTING")?;
                         Ok::<(), io::Error>(())
-                    },
-                )
+                    })
                 .map_err(|error| io::Error::other(format!("Gate denied demo callback: {error:?}")))?;
             Ok(DemoStatus::NoopReached)
         }
