@@ -6,3 +6,5 @@
 pub mod storage;
 
 pub mod proposal;
+
+pub mod sync;
