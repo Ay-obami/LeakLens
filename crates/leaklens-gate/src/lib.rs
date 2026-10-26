@@ -1,55 +1,34 @@
-//! Pre-authorization privacy gate for an already constructed Zcash wallet proposal.
+//! A single-use pre-authorization privacy review for a Zcash transaction.
 //!
-//! The caller must pass a canonical, complete encoding of the *actual* SDK
-//! proposal to [`fingerprint_canonical_proposal`]. The gate cannot establish
-//! that a caller-supplied byte sequence covers every relevant proposal field.
+//! The integration must derive both `ProposalFacts` and canonical bytes from
+//! the *same real SDK proposal*. This crate recomputes policy findings itself,
+//! keeps the assessment private, and invokes the signing callback only after
+//! a fresh canonical encoding matches. It cannot stop a separate wallet path
+//! that bypasses this API, or stop mutations after the encoding callback if
+//! the caller does not keep the proposal immutable/locked through signing.
 
+use leaklens_core::{assess, Policy, PrivacyAssessment, ProposalFacts};
 use sha2::{Digest, Sha256};
 
 const FINGERPRINT_DOMAIN: &[u8] = b"LeakLens/ZcashProposal/v1\0";
 
-/// Fingerprint of an entire canonical SDK proposal, not its privacy summary.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct ProposalFingerprint {
-    bytes: [u8; 32],
-    empty: bool,
-}
+pub struct ProposalFingerprint([u8; 32]);
 
 impl ProposalFingerprint {
     pub fn as_bytes(&self) -> &[u8; 32] {
-        &self.bytes
+        &self.0
     }
 }
 
-/// Domain-separated SHA-256 over length-prefixed canonical proposal bytes.
-///
-/// The integration layer is responsible for providing the SDK's complete,
-/// deterministic encoding, including inputs, outputs, amounts, change, fees,
-/// and any other fields that affect signing.
+/// Hash a complete, deterministic SDK proposal encoding, including all
+/// signing-relevant fields. The caller must not pass a lossy facts summary.
 pub fn fingerprint_canonical_proposal(canonical: &[u8]) -> ProposalFingerprint {
     let mut hasher = Sha256::new();
     hasher.update(FINGERPRINT_DOMAIN);
     hasher.update((canonical.len() as u64).to_be_bytes());
     hasher.update(canonical);
-    ProposalFingerprint {
-        bytes: hasher.finalize().into(),
-        empty: canonical.is_empty(),
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct PolicyVersion(pub u32);
-
-/// An assessment already produced by the privacy rules engine.
-///
-/// Only the gate-relevant summary lives here. Conversion from the policy
-/// crate's complete `PrivacyAssessment` belongs to the integration layer.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct GateAssessment {
-    pub fingerprint: ProposalFingerprint,
-    pub policy_version: PolicyVersion,
-    pub complete: bool,
-    pub warning_count: usize,
+    ProposalFingerprint(hasher.finalize().into())
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -59,70 +38,101 @@ pub enum GateDecision {
     DenyIncomplete,
 }
 
-pub fn prepare_decision(assessment: &GateAssessment) -> GateDecision {
-    if !assessment.complete || assessment.fingerprint.empty {
-        GateDecision::DenyIncomplete
-    } else if assessment.warning_count > 0 {
-        GateDecision::RequireAcknowledgment
-    } else {
-        GateDecision::Allow
-    }
-}
-
-/// An explicit user acknowledgment bound to a particular assessed proposal.
-/// Construct only after the interface has shown the findings to the user.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Approval {
-    fingerprint: ProposalFingerprint,
-    policy_version: PolicyVersion,
-}
-
-impl Approval {
-    pub fn acknowledge(assessment: &GateAssessment) -> Self {
-        Self {
-            fingerprint: assessment.fingerprint,
-            policy_version: assessment.policy_version,
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GateError {
     EmptyProposal,
-    ProposalChanged,
-    PolicyChanged,
     IncompleteAssessment,
     AcknowledgmentRequired,
-    ApprovalMismatch,
+    AcknowledgmentNotRequired,
+    PolicyChanged,
+    ProposalChanged,
 }
 
-/// Verify the exact proposal and policy again immediately before entering
-/// the wallet's signing/authorization path.
-pub fn authorize(
-    assessment: &GateAssessment,
-    current_fingerprint: ProposalFingerprint,
-    current_policy_version: PolicyVersion,
-    approval: Option<&Approval>,
-) -> Result<(), GateError> {
-    if assessment.fingerprint.empty || current_fingerprint.empty {
-        return Err(GateError::EmptyProposal);
+#[derive(Debug, PartialEq, Eq)]
+pub enum GateRunError<E> {
+    Gate(GateError),
+    Encoding(E),
+    Signing(E),
+}
+
+/// Non-cloneable, one-use review. No public assessment or approval
+/// constructors are exposed; the core engine is run inside `inspect`.
+pub struct GateReview {
+    fingerprint: ProposalFingerprint,
+    assessment: PrivacyAssessment,
+    acknowledged: bool,
+}
+
+impl GateReview {
+    /// Inspect normalized facts produced by the trusted SDK adapter.
+    /// Integration must guarantee facts and canonical bytes describe the
+    /// exact same immutable transaction proposal.
+    pub fn inspect(
+        facts: &ProposalFacts,
+        policy: &Policy,
+        canonical_proposal: &[u8],
+    ) -> Result<Self, GateError> {
+        if canonical_proposal.is_empty() {
+            return Err(GateError::EmptyProposal);
+        }
+        Ok(Self {
+            fingerprint: fingerprint_canonical_proposal(canonical_proposal),
+            assessment: assess(facts, policy),
+            acknowledged: false,
+        })
     }
-    if assessment.policy_version != current_policy_version {
-        return Err(GateError::PolicyChanged);
+
+    /// Show this assessment to the user before accepting an acknowledgment.
+    pub fn assessment(&self) -> &PrivacyAssessment {
+        &self.assessment
     }
-    if assessment.fingerprint != current_fingerprint {
-        return Err(GateError::ProposalChanged);
-    }
-    if !assessment.complete {
-        return Err(GateError::IncompleteAssessment);
-    }
-    if assessment.warning_count > 0 {
-        let approval = approval.ok_or(GateError::AcknowledgmentRequired)?;
-        if approval.fingerprint != assessment.fingerprint
-            || approval.policy_version != assessment.policy_version
-        {
-            return Err(GateError::ApprovalMismatch);
+
+    pub fn decision(&self) -> GateDecision {
+        if !self.assessment.complete {
+            GateDecision::DenyIncomplete
+        } else if !self.assessment.findings.is_empty() {
+            GateDecision::RequireAcknowledgment
+        } else {
+            GateDecision::Allow
         }
     }
-    Ok(())
+
+    /// Called only by the wallet UI's explicit confirmation handler after
+    /// displaying this review. The crate cannot authenticate a UI event.
+    pub fn acknowledge(&mut self) -> Result<(), GateError> {
+        match self.decision() {
+            GateDecision::Allow => Err(GateError::AcknowledgmentNotRequired),
+            GateDecision::DenyIncomplete => Err(GateError::IncompleteAssessment),
+            GateDecision::RequireAcknowledgment => {
+                self.acknowledged = true;
+                Ok(())
+            }
+        }
+    }
+
+    /// Consume the review exactly once. The wallet must hold the actual
+    /// proposal immutable/locked while `encode_current` and `sign` run.
+    /// The signing callback is never called on an error.
+    pub fn authorize_and_execute<R, E>(
+        self,
+        current_policy: &Policy,
+        encode_current: impl FnOnce() -> Result<Vec<u8>, E>,
+        sign: impl FnOnce() -> Result<R, E>,
+    ) -> Result<R, GateRunError<E>> {
+        if current_policy.version != self.assessment.policy_version {
+            return Err(GateRunError::Gate(GateError::PolicyChanged));
+        }
+        if !self.assessment.complete {
+            return Err(GateRunError::Gate(GateError::IncompleteAssessment));
+        }
+        if !self.assessment.findings.is_empty() && !self.acknowledged {
+            return Err(GateRunError::Gate(GateError::AcknowledgmentRequired));
+        }
+
+        let bytes = encode_current().map_err(GateRunError::Encoding)?;
+        if bytes.is_empty() || fingerprint_canonical_proposal(&bytes) != self.fingerprint {
+            return Err(GateRunError::Gate(GateError::ProposalChanged));
+        }
+        sign().map_err(GateRunError::Signing)
+    }
 }
