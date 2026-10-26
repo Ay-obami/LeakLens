@@ -21,9 +21,9 @@ jobs:
           components: clippy, rustfmt
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
-      - name: Check Rustfmt
-        run: cargo +1.95.0 fmt --all -- --check
       - name: Run all workspace tests
         run: cargo +1.95.0 test --workspace
+      - name: Check Rustfmt
+        run: cargo +1.95.0 fmt --all -- --check
       - name: Strict Clippy
         run: cargo +1.95.0 clippy --workspace --all-targets -- -D warnings
