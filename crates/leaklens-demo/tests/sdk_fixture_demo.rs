@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use leaklens_demo::{run_sdk_fixture_demo, run_sdk_fixture_demo_mode, DemoFixture, DemoStatus};
+use leaklens_demo::{DemoFixture, DemoStatus, run_sdk_fixture_demo, run_sdk_fixture_demo_mode};
 
 #[test]
 fn real_sdk_fixture_passes_through_adapter_review_and_noop_gate() {
@@ -18,7 +18,11 @@ fn aborted_sdk_fixture_never_reaches_noop_callback() {
     let mut output = Vec::new();
     let result = run_sdk_fixture_demo(Cursor::new(Vec::<u8>::new()), &mut output).unwrap();
     assert_eq!(result, DemoStatus::Cancelled);
-    assert!(!String::from_utf8(output).unwrap().contains("NO-OP CALLBACK REACHED"));
+    assert!(
+        !String::from_utf8(output)
+            .unwrap()
+            .contains("NO-OP CALLBACK REACHED")
+    );
 }
 
 #[test]
@@ -57,5 +61,9 @@ fn sdk_transparent_payment_cannot_continue_without_acknowledgment() {
     )
     .expect("denial is a normal user choice");
     assert_eq!(outcome, DemoStatus::Cancelled);
-    assert!(!String::from_utf8(output).unwrap().contains("NO-OP CALLBACK REACHED"));
+    assert!(
+        !String::from_utf8(output)
+            .unwrap()
+            .contains("NO-OP CALLBACK REACHED")
+    );
 }

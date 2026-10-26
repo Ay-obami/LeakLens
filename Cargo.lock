@@ -897,7 +897,9 @@ dependencies = [
  "leaklens-core",
  "leaklens-gate",
  "leaklens-zcash",
+ "sapling-crypto",
  "zcash_client_backend",
+ "zcash_protocol",
 ]
 
 [[package]]

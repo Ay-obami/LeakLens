@@ -5,11 +5,7 @@
 //! authorization, and must never alter it before passing it to its signer.
 
 use prost::Message;
-use zcash_client_backend::{
-    fees::StandardFeeRule,
-    proposal::Proposal,
-    proto::proposal,
-};
+use zcash_client_backend::{fees::StandardFeeRule, proposal::Proposal, proto::proposal};
 
 /// Serializes all proposal fields represented by the SDK's standard proposal
 /// protobuf: inputs, selected pools, change, fee, target and policy metadata.

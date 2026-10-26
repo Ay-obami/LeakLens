@@ -1,6 +1,5 @@
 use crate::model::{
-    Certainty, Finding, Policy, PoolKind, PrivacyAssessment, ProposalFacts, RecipientKind,
-    Severity,
+    Certainty, Finding, Policy, PoolKind, PrivacyAssessment, ProposalFacts, RecipientKind, Severity,
 };
 
 pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
@@ -8,7 +7,11 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
     let mut complete = !facts.steps.is_empty();
 
     if facts.steps.is_empty() {
-        findings.push(incomplete(0, None, "Transaction proposal contains no steps"));
+        findings.push(incomplete(
+            0,
+            None,
+            "Transaction proposal contains no steps",
+        ));
     }
 
     for (step_index, step) in facts.steps.iter().enumerate() {
@@ -37,9 +40,15 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
         }
 
         for (payment_index, payment) in step.payments.iter().enumerate() {
-            if payment.selected_pool == PoolKind::Unknown || payment.recipient_kind == RecipientKind::Unknown {
+            if payment.selected_pool == PoolKind::Unknown
+                || payment.recipient_kind == RecipientKind::Unknown
+            {
                 complete = false;
-                findings.push(incomplete(step_index, Some(payment_index), "Recipient or selected payment pool cannot be assessed"));
+                findings.push(incomplete(
+                    step_index,
+                    Some(payment_index),
+                    "Recipient or selected payment pool cannot be assessed",
+                ));
                 continue;
             }
 
@@ -49,7 +58,11 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                     && payment.selected_pool == PoolKind::Transparent)
             {
                 complete = false;
-                findings.push(incomplete(step_index, Some(payment_index), "Recipient kind conflicts with the selected output pool"));
+                findings.push(incomplete(
+                    step_index,
+                    Some(payment_index),
+                    "Recipient kind conflicts with the selected output pool",
+                ));
                 continue;
             }
 
@@ -60,7 +73,8 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                     payment_index: Some(payment_index),
                     severity: Severity::Warning,
                     certainty: Certainty::PublicDisclosure,
-                    message: "The transparent recipient and payment amount will be publicly visible",
+                    message:
+                        "The transparent recipient and payment amount will be publicly visible",
                 });
 
                 if step.has_shielded_inputs || step.has_prior_shielded_funding {
@@ -81,7 +95,8 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
                         payment_index: Some(payment_index),
                         severity: Severity::Warning,
                         certainty: Certainty::PublicDisclosure,
-                        message: "The Unified Address is being paid through its transparent receiver",
+                        message:
+                            "The Unified Address is being paid through its transparent receiver",
                     });
                 }
             }
@@ -110,11 +125,19 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
 
         if step.change_pools.contains(&PoolKind::Unknown) {
             complete = false;
-            findings.push(incomplete(step_index, None, "A change output pool cannot be assessed"));
+            findings.push(incomplete(
+                step_index,
+                None,
+                "A change output pool cannot be assessed",
+            ));
         }
     }
 
-    PrivacyAssessment { findings, complete, policy_version: policy.version }
+    PrivacyAssessment {
+        findings,
+        complete,
+        policy_version: policy.version,
+    }
 }
 
 fn incomplete(step_index: usize, payment_index: Option<usize>, message: &'static str) -> Finding {

@@ -9,7 +9,10 @@ fn main() -> io::Result<()> {
         (Some("--transparent"), None) => leaklens_demo::DemoFixture::Transparent,
         _ => {
             eprintln!("Usage: leaklens-demo [--shielded|--transparent]");
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "unknown demo option"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "unknown demo option",
+            ));
         }
     };
     let stdin = io::stdin();

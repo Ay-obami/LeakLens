@@ -7,9 +7,7 @@
 use leaklens_core::Policy;
 use leaklens_demo::{PendingZcashReview, execute_reviewed_zcash_signing};
 use sapling::prover::{OutputProver, SpendProver};
-use zcash_client_backend::{
-    data_api::{WalletCommitmentTrees, WalletWrite, wallet::SpendingKeys},
-};
+use zcash_client_backend::data_api::{WalletCommitmentTrees, WalletWrite, wallet::SpendingKeys};
 use zcash_protocol::consensus::Parameters;
 
 #[allow(dead_code, clippy::too_many_arguments)]

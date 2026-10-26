@@ -28,8 +28,7 @@ impl<'a, NoteRef> PendingZcashReview<'a, NoteRef> {
     ) -> Result<Self, InspectError> {
         let facts = extract_proposal_facts(proposal).map_err(InspectError::Adapter)?;
         let encoded = encode_canonical_standard_proposal(proposal);
-        let review = GateReview::inspect(&facts, &policy, &encoded)
-            .map_err(InspectError::Gate)?;
+        let review = GateReview::inspect(&facts, &policy, &encoded).map_err(InspectError::Gate)?;
         Ok(Self { proposal, review })
     }
 

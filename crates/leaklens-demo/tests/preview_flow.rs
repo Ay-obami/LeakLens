@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use leaklens_core::{PaymentFacts, Policy, PoolKind, ProposalFacts, RecipientKind, StepFacts};
-use leaklens_demo::{preview_review, PreviewOutcome};
+use leaklens_demo::{PreviewOutcome, preview_review};
 use leaklens_gate::GateReview;
 
 fn review(recipient: RecipientKind, pool: PoolKind) -> GateReview {
@@ -37,7 +37,8 @@ fn warning_displays_disclosure_and_requires_explicit_acknowledgment() {
 #[test]
 fn empty_input_does_not_approve_a_warned_payment() {
     let mut review = review(RecipientKind::Transparent, PoolKind::Transparent);
-    let outcome = preview_review(&mut review, Cursor::new(Vec::<u8>::new()), &mut Vec::new()).unwrap();
+    let outcome =
+        preview_review(&mut review, Cursor::new(Vec::<u8>::new()), &mut Vec::new()).unwrap();
     assert_eq!(outcome, PreviewOutcome::Abort);
 }
 
@@ -61,7 +62,11 @@ fn incomplete_assessment_cannot_be_acknowledged() {
     let mut output = Vec::new();
     let outcome = preview_review(&mut review, Cursor::new(b"ACKNOWLEDGE\n"), &mut output).unwrap();
     assert_eq!(outcome, PreviewOutcome::Abort);
-    assert!(String::from_utf8(output).unwrap().contains("INSPECTION INCOMPLETE"));
+    assert!(
+        String::from_utf8(output)
+            .unwrap()
+            .contains("INSPECTION INCOMPLETE")
+    );
 }
 
 #[test]
@@ -74,7 +79,8 @@ fn clear_assessment_requires_a_continue_decision() {
 #[test]
 fn explicit_acknowledgment_does_not_turn_preview_into_signing() {
     let mut review = review(RecipientKind::Transparent, PoolKind::Transparent);
-    let outcome = preview_review(&mut review, Cursor::new(b"ACKNOWLEDGE\n"), &mut Vec::new()).unwrap();
+    let outcome =
+        preview_review(&mut review, Cursor::new(b"ACKNOWLEDGE\n"), &mut Vec::new()).unwrap();
     assert_eq!(outcome, PreviewOutcome::ProceedToWallet);
     // The preview never constructs, signs, or broadcasts a transaction.
     // The consuming wallet must separately call GateReview::authorize_and_execute.

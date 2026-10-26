@@ -9,7 +9,11 @@ use zcash_client_backend::{
     wallet::WalletTransparentOutput,
 };
 use zcash_keys::address::Address;
-use zcash_protocol::{consensus::{BlockHeight, Network}, value::Zatoshis, PoolType};
+use zcash_protocol::{
+    PoolType,
+    consensus::{BlockHeight, Network},
+    value::Zatoshis,
+};
 use zcash_transparent::address::TransparentAddress;
 use zcash_transparent::bundle::{OutPoint, TxOut};
 use zip321::{Payment, TransactionRequest};
