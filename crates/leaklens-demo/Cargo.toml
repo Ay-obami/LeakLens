@@ -7,4 +7,4 @@ license = "MIT"
 [dependencies]
 leaklens-core = { path = "../leaklens-core" }
 leaklens-gate = { path = "../leaklens-gate" }
-
+leaklens-zcash = { path = "../leaklens-zcash" }
