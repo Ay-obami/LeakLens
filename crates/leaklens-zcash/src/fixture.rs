@@ -7,17 +7,16 @@ use zcash_keys::address::UnifiedAddress;
 use zcash_client_backend::{
     address::Address,
     data_api::wallet::ConfirmationsPolicy,
-    fees::TransactionBalance,
+    fees::{TransactionBalance, StandardFeeRule},
     proposal::Proposal,
 };
-use zcash_primitives::transaction::fees::zip317::FeeRule;
 use zcash_protocol::{consensus::{BlockHeight, Network}, value::Zatoshis, PoolType};
 use zip321::{Payment, TransactionRequest};
 
 /// A validated SDK proposal describing one testnet shielded payment.
 /// It intentionally contains no spendable inputs: it is a structural fixture,
 /// not a wallet-funded transaction and cannot be sent to the network.
-pub fn sample_shielded_proposal() -> Proposal<FeeRule, u32> {
+pub fn sample_shielded_proposal() -> Proposal<StandardFeeRule, u32> {
     let spending_key = SpendingKey::from_bytes([7; 32]).expect("test key");
     let receiver = FullViewingKey::from(&spending_key).address_at(0u32, zip32::Scope::External);
     let unified = UnifiedAddress::from_receivers(Some(receiver), None, None)
@@ -34,7 +33,7 @@ pub fn sample_shielded_proposal() -> Proposal<FeeRule, u32> {
         None,
         BlockHeight::from_u32(100),
         balance,
-        FeeRule::standard(),
+        StandardFeeRule::Zip317,
         BlockHeight::from_u32(101).into(),
         ConfirmationsPolicy::default(),
         false,
