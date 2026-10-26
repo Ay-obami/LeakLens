@@ -16,7 +16,7 @@ fn sync_refuses_plaintext_lightwalletd_endpoint() {
 
 #[test]
 fn sync_accepts_bounded_tls_testnet_configuration() {
-    let config = SyncConfig::new("https://testnet.zec.rocks:443", 100)
-        .expect("valid bounded config");
+    let config =
+        SyncConfig::new("https://testnet.zec.rocks:443", 100).expect("valid bounded config");
     assert_eq!(config.max_blocks(), 100);
 }
