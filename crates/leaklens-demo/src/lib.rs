@@ -10,7 +10,9 @@ use leaklens_core::Certainty;
 use leaklens_gate::{GateDecision, GateReview};
 use leaklens_core::Policy;
 use leaklens_zcash::{
-    encode_canonical_standard_proposal, extract_proposal_facts, fixture::sample_shielded_proposal,
+    encode_canonical_standard_proposal,
+    extract_proposal_facts,
+    fixture::{sample_shielded_proposal, sample_transparent_proposal},
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -87,6 +89,12 @@ pub enum DemoStatus {
     NoopReached,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DemoFixture {
+    Shielded,
+    Transparent,
+}
+
 /// Demonstrates SDK proposal extraction and the UI/gate sequence without keys,
 /// signing, transaction construction, network access, or broadcasting.
 ///
@@ -97,7 +105,19 @@ pub fn run_sdk_fixture_demo(
     input: impl BufRead,
     output: &mut impl Write,
 ) -> io::Result<DemoStatus> {
-    let proposal = sample_shielded_proposal();
+    run_sdk_fixture_demo_mode(input, output, DemoFixture::Shielded)
+}
+
+/// Display either SDK fixture through the same fail-closed review boundary.
+pub fn run_sdk_fixture_demo_mode(
+    input: impl BufRead,
+    output: &mut impl Write,
+    fixture: DemoFixture,
+) -> io::Result<DemoStatus> {
+    let proposal = match fixture {
+        DemoFixture::Shielded => sample_shielded_proposal(),
+        DemoFixture::Transparent => sample_transparent_proposal(),
+    };
     let facts = extract_proposal_facts(&proposal)
         .map_err(|error| io::Error::other(format!("SDK adapter could not inspect proposal: {error:?}")))?;
     let policy = Policy::default();
