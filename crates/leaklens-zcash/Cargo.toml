@@ -1,0 +1,16 @@
+[package]
+name = "leaklens-zcash"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+zcash_client_backend.workspace = true
+zcash_protocol.workspace = true
+zcash_primitives.workspace = true
+zcash_address.workspace = true
+zip321.workspace = true
+orchard.workspace = true
+zip32.workspace = true
+
