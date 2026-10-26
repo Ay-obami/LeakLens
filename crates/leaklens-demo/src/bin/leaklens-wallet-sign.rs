@@ -40,8 +40,12 @@ fn main() -> Result<()> {
     let destination = db
         .get_last_generated_address_matching(account, UnifiedAddressRequest::SHIELDED)?
         .context("no shielded address")?;
-    let proposal =
-        propose_testnet_transfer(&mut db, account, &Address::Unified(destination), amount)?;
+    let proposal = propose_testnet_transfer(
+        &mut db,
+        account,
+        &Address::Unified(Box::new(destination)),
+        amount,
+    )?;
     println!("Testnet self-transfer proposal: {amount_u64} zatoshis");
     for step in proposal.steps() {
         println!(
