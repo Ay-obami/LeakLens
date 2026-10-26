@@ -6,10 +6,12 @@ use zcash_client_backend::{
     data_api::wallet::{ConfirmationsPolicy, TargetHeight},
     fees::TransactionBalance,
     proposal::Proposal,
+    wallet::WalletTransparentOutput,
 };
 use zcash_keys::address::Address;
 use zcash_protocol::{consensus::{BlockHeight, Network}, value::Zatoshis, PoolType};
 use zcash_transparent::address::TransparentAddress;
+use zcash_transparent::bundle::{OutPoint, TxOut};
 use zip321::{Payment, TransactionRequest};
 
 fn empty_sdk_proposal() -> Proposal<(), u32> {
@@ -31,6 +33,16 @@ fn empty_sdk_proposal() -> Proposal<(), u32> {
 
 fn transparent_sdk_proposal() -> Proposal<(), u32> {
     let recipient = Address::Transparent(TransparentAddress::PublicKeyHash([0x11; 20]));
+    let input_address = TransparentAddress::PublicKeyHash([0x22; 20]);
+    let funding_input = WalletTransparentOutput::<()>::from_parts(
+        OutPoint::new([0x33; 32], 0),
+        TxOut::new(Zatoshis::const_from_u64(1), input_address.script().into()),
+        Some(BlockHeight::from_u32(90)),
+        None,
+        None,
+        None,
+    )
+    .expect("valid synthetic test funding output");
     let request = TransactionRequest::new(vec![
         Payment::new(
             recipient.to_zcash_address(&Network::TestNetwork),
@@ -47,7 +59,7 @@ fn transparent_sdk_proposal() -> Proposal<(), u32> {
     Proposal::single_step(
         request,
         BTreeMap::from([(0usize, PoolType::TRANSPARENT)]),
-        vec![],
+        vec![funding_input],
         None,
         BlockHeight::from_u32(100),
         TransactionBalance::new(vec![], Zatoshis::const_from_u64(0)).unwrap(),
