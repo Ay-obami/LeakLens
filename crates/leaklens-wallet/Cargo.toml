@@ -23,5 +23,7 @@ sapling = { package = "sapling-crypto", version = "0.7" }
 orchard.workspace = true
 zcash_primitives.workspace = true
 
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
 [dev-dependencies]
 tempfile = "3"
