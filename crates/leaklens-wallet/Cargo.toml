@@ -24,6 +24,7 @@ orchard.workspace = true
 zcash_primitives.workspace = true
 
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+rustls = { version = "0.23", features = ["ring"] }
 
 [dev-dependencies]
 tempfile = "3"
