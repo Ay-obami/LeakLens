@@ -12,6 +12,19 @@ pub fn assess(facts: &ProposalFacts, policy: &Policy) -> PrivacyAssessment {
     }
 
     for (step_index, step) in facts.steps.iter().enumerate() {
+        if step.payments.is_empty()
+            && !step.has_transparent_inputs
+            && !step.has_shielded_inputs
+            && !step.has_prior_shielded_funding
+            && step.change_pools.is_empty()
+        {
+            complete = false;
+            findings.push(incomplete(
+                step_index,
+                None,
+                "Transaction step has no payment, funding input, or change to assess",
+            ));
+        }
         if step.has_transparent_inputs {
             findings.push(Finding {
                 code: "LL-002",
