@@ -26,6 +26,16 @@ The policy is deliberately conservative. “No findings” means none of these *
 3. `leaklens-gate`: bind a review/acknowledgment to the exact proposal and policy version; reject mismatched or incomplete decisions.
 4. `leaklens-wallet`: persist a **testnet-only** account, sync compact blocks, construct SDK-native transactions, and expose separate proposal and broadcast CLIs.
 5. `leaklens-demo`: provide the non-signing SDK-fixture demo **and** a guarded wallet signer that requires review and exact-amount confirmation before accessing locally encrypted recovery material.
+6. `leaklens-api`: expose a **non-signing**, bounded public HTTP privacy-assessment API; it cannot access wallets, sign, or broadcast.
+7. `web/`: browser-based privacy-review demonstration and landing page, designed for Vercel static hosting.
+
+## Public web demo and deployment
+
+The public-facing web app (`web/`) and API (`crates/leaklens-api/`) are deliberately separate from the funded Zcash wallet CLI. The hosted app demonstrates the privacy rules using synthetic SDK fixtures or explicitly **user-supplied, unverified facts**. These inputs do not establish what a wallet will actually sign and **must not be used as authorization for funds**.
+
+Run the Rust API with `cargo run -p leaklens-api` and the frontend from `web/` with `npm ci` followed by `npm run dev`. The API serves `/health`, `/api/v1/fixtures`, and `/api/v1/assess`. Set `LEAKLENS_ALLOWED_ORIGIN` to the exact frontend origin for cross-origin browser access; set `VITE_LEAKLENS_API_URL` in the web build to the deployed API origin.
+
+For Railway + Vercel configuration and cost constraints, see [deployment instructions](deploy/README.md) and [security review](docs/deployment-security-review.md). The funded disposable testnet key is not migrated to cloud hosting.
 
 The intended wallet integration point is **after proposal generation but before authorization**. The harness must route every authorization path through the gate for that guarantee to hold; installing a library alone does not intercept other wallets.
 

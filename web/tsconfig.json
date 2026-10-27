@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "lib": ["ES2022", "DOM", "DOM.Iterable"], "module": "ESNext", "moduleResolution": "Bundler",
+    "strict": true, "noEmit": true, "allowImportingTsExtensions": true, "skipLibCheck": true, "types": []
+  },
+  "include": ["src/main.ts", "src/policy.ts", "src/api.ts", "src/vite-env.d.ts"]
+}

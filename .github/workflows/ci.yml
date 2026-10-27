@@ -9,6 +9,32 @@ permissions:
   contents: read
 
 jobs:
+  railway-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the same container image used by Railway
+        run: docker build --file deploy/Dockerfile --tag leaklens-api:ci .
+  web-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci
+      - name: Run web tests
+        run: npm test
+      - name: Build static web app
+        run: npm run build
   test-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 20
