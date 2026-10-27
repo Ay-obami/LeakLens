@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/leaklens-zcash", "crates/leaklens-core", "crates/leaklens-gate", "crates/leaklens-demo", "crates/leaklens-wallet"]
+members = ["crates/leaklens-zcash", "crates/leaklens-core", "crates/leaklens-gate", "crates/leaklens-demo", "crates/leaklens-wallet", "crates/leaklens-api"]
 
 [workspace.package]
 edition = "2024"
