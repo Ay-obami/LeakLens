@@ -4,7 +4,7 @@
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use rand_core::OsRng;
+use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 use secrecy::SecretVec;
 use zcash_client_backend::data_api::{AccountBirthday, WalletWrite};
@@ -16,7 +16,7 @@ use zcash_keys::{
 use zcash_protocol::consensus::Network;
 
 /// A persistent testnet database. Never point this at an existing mainnet DB.
-pub type TestnetWalletDb = WalletDb<Connection, Network, SystemClock, OsRng>;
+pub type TestnetWalletDb = WalletDb<Connection, Network, SystemClock, ThreadRng>;
 
 /// Open and migrate an existing testnet wallet DB, or initialize a new one.
 ///
@@ -24,7 +24,7 @@ pub type TestnetWalletDb = WalletDb<Connection, Network, SystemClock, OsRng>;
 /// a seed for migration, this returns a migration error without attempting to
 /// recover or read the seed from the environment or disk.
 pub fn open_testnet_wallet(path: &Path) -> Result<TestnetWalletDb> {
-    let mut wallet_db = WalletDb::for_path(path, Network::TestNetwork, SystemClock, OsRng)
+    let mut wallet_db = WalletDb::for_path(path, Network::TestNetwork, SystemClock, rand::rng())
         .with_context(|| format!("opening testnet wallet DB at {}", path.display()))?;
     init_wallet_db(&mut wallet_db, None)
         .context("initializing or migrating Zcash testnet wallet DB")?;

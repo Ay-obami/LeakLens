@@ -14,6 +14,14 @@ use zcash_protocol::{
     consensus::{BlockHeight, BranchId, Network},
 };
 
+/// Select the consensus branch that a transaction mined in the next testnet block must use.
+fn expected_testnet_branch(tip: u32) -> BranchId {
+    BranchId::for_height(
+        &Network::TestNetwork,
+        BlockHeight::from_u32(tip.saturating_add(1)),
+    )
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     rustls::crypto::ring::default_provider()
@@ -63,19 +71,9 @@ async fn main() -> Result<()> {
         .height
         .try_into()
         .context("invalid chain tip")?;
-    // NU7 activated on public Zcash testnet at height 4,465,026. The pinned
-    // consensus library has no NU7 testnet activation and signs Nu6_3 txs.
-    // Never send those transactions to an NU7 consensus node.
-    ensure!(
-        tip < 4_465_026,
-        "NU7 is active on public testnet; pinned wallet SDK lacks NU7 signing support. Upgrade the consensus SDK and re-sign before broadcast"
-    );
     println!("Approved signed tx: {approved_txid}");
     println!("Current testnet height: {tip}; transaction expiry: {expiry}");
-    let expected_branch = BranchId::for_height(
-        &Network::TestNetwork,
-        BlockHeight::from_u32(tip.saturating_add(1)),
-    );
+    let expected_branch = expected_testnet_branch(tip);
     println!(
         "Transaction branch: {:?}; expected testnet branch: {:?}",
         transaction.consensus_branch_id(),
@@ -107,4 +105,16 @@ async fn main() -> Result<()> {
     println!("Accepted for testnet relay: {approved_txid}");
     println!("Not yet mined; monitor confirmations separately.");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn public_testnet_nu7_activation_uses_new_consensus_branch() {
+        assert_eq!(expected_testnet_branch(4_465_024), BranchId::Nu6_3);
+        assert_eq!(expected_testnet_branch(4_465_025), BranchId::Nu7);
+        assert_eq!(expected_testnet_branch(4_545_970), BranchId::Nu7);
+    }
 }

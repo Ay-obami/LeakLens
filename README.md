@@ -4,7 +4,7 @@
 
 LeakLens examines the destination pool, transparent inputs, shielded inputs, change pools, and available proposal metadata before a wallet proceeds with authorization. It presents concrete public disclosures separately from *possible* privacy correlations, so users can reconsider a payment route before committing to it.
 
-> **Development status (October 26, 2026):** The project is a hackathon prototype with a runnable, explicitly non-signing CLI and SDK-backed tests. SDK proposal fixtures are structural; a funded transaction, completed wallet signature, and network broadcast have **not** been demonstrated. Do not use the prototype to protect real funds.
+> **Development status (October 27, 2026):** LeakLens is a hackathon prototype with a fixture-only, non-signing demo **and a separate real Zcash testnet wallet flow**. The wallet flow used an independently funded disposable 1 TAZ account, reviewed and signed a 0.01 TAZ shielded self-transfer through the authorization gate, and broadcast an NU7-compatible transaction confirmed in testnet block 4,546,012. See [verification evidence](docs/verification.md). This is not a production wallet or a guarantee of anonymity. Never use real funds.
 
 ## What LeakLens checks
 
@@ -24,7 +24,8 @@ The policy is deliberately conservative. “No findings” means none of these *
 1. `leaklens-zcash`: translate official `librustzcash` proposal structures into explicitly typed facts.
 2. `leaklens-core`: run deterministic privacy rules without handling spending keys.
 3. `leaklens-gate`: bind a review/acknowledgment to the exact proposal and policy version; reject mismatched or incomplete decisions.
-4. `leaklens-demo`: run an SDK-fixture CLI review and verify the same proposal fingerprint before a **no-op**, non-signing callback.
+4. `leaklens-wallet`: persist a **testnet-only** account, sync compact blocks, construct SDK-native transactions, and expose separate proposal and broadcast CLIs.
+5. `leaklens-demo`: provide the non-signing SDK-fixture demo **and** a guarded wallet signer that requires review and exact-amount confirmation before accessing locally encrypted recovery material.
 
 The intended wallet integration point is **after proposal generation but before authorization**. The harness must route every authorization path through the gate for that guarantee to hold; installing a library alone does not intercept other wallets.
 
@@ -54,7 +55,21 @@ cargo +1.95.0 run --bin leaklens-demo -- --transparent
 
 The shielded fixture presents no findings under the implemented rules and accepts `CONTINUE` or `REVISE`. The transparent fixture displays `LL-002` (public funding inputs) and `LL-001` (public recipient and value), requiring `ACKNOWLEDGE` to proceed or `REVISE` to cancel. Both reach at most a **NO-OP CALLBACK**—neither signs, funds, nor broadcasts a payment.
 
-See [Demo walkthrough](docs/demo.md), [Privacy model](docs/privacy-model.md), and [Submission proof checklist](docs/submission-checklist.md).
+The independent, **testnet-only** wallet flow uses these binaries (paths are caller-owned; no seed is committed):
+
+```text
+leaklens-wallet-balance WALLET_DB
+leaklens-wallet-propose WALLET_DB AMOUNT_ZATOSHIS
+leaklens-wallet-sign WALLET_DB SEED_AGE AGE_IDENTITY AMOUNT_ZATOSHIS
+leaklens-wallet-broadcast HTTPS_TESTNET_LIGHTWALLETD WALLET_DB APPROVED_TXID
+```
+
+Signing is interactive and distinct from broadcasting. The broadcaster verifies
+that the endpoint advertises testnet, that the signed transaction has the
+current consensus branch, and that its expiry has sufficient headroom. Only
+the disposable testnet wallet has been exercised, not a production integration.
+
+See [Demo walkthrough](docs/demo.md), [Privacy model](docs/privacy-model.md), [verified testnet evidence](docs/verification.md), and [Submission proof checklist](docs/submission-checklist.md).
 
 ## Security boundaries
 

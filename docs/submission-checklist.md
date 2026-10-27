@@ -5,7 +5,7 @@
 ## Essential proof
 
 - [ ] Repository is public and the exact submitted commit SHA is recorded.
-- [ ] README states the actual implemented state without claiming funded or signed transactions.
+- [x] README distinguishes the fixture-only demo from the verified funded, signed, mined NU7 testnet flow.
 - [ ] MIT license and attribution are present.
 - [ ] `cargo +1.95.0 test --workspace` passes at the submitted SHA; save uncut output.
 - [ ] `cargo +1.95.0 fmt --all -- --check` and strict Clippy pass; record versions.
@@ -21,7 +21,7 @@
 - [ ] Show actual running tests or executable interface, clearly labeling which one.
 - [ ] Separate definite public disclosures from uncertain amount/timing correlations.
 - [ ] Show a failed/incomplete review and what the gate does.
-- [ ] Explain current limitations: library-level preview, SDK fixtures, no funded/signing/broadcast proof unless subsequently verified.
+- [ ] Explain current limitations: fixture-only CLI does not spend; the separate wallet flow is verified only on disposable public testnet, not mainnet or arbitrary external wallets.
 - [ ] End on concrete Zcash relevance and repository URL.
 - [ ] Review video at normal speed; no misleading splices or fabricated completion banners.
 

@@ -12,7 +12,7 @@ zcash_client_backend.workspace = true
 zcash_protocol.workspace = true
 zcash_primitives.workspace = true
 zcash_address.workspace = true
-zcash_transparent = "=0.10.0"
+zcash_transparent = "=0.11.0-pre.2"
 zip321.workspace = true
 orchard.workspace = true
 zip32.workspace = true
