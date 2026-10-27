@@ -113,17 +113,44 @@ The replacement transaction was rejected by public testnet relay at height
 The pinned `zcash_protocol 0.10.5` library selects `Nu6_3` on testnet height
 4,544,675 because its network activation table still has no NU7 activation.
 NU7 activated on public testnet at **height 4,465,026** in October 2026.
-Therefore, the broadcaster now **fails closed before network submission**
-when the tip is on NU7. An updated, compatible consensus/wallet SDK and a
-fresh signed transaction are required. Never alter a signed transaction's
-branch ID or claim its broadcast succeeded.
+At this earlier checkpoint, the pre-migration broadcaster **failed closed before
+network submission** when the tip was on NU7. A compatible SDK upgrade and
+fresh signature were therefore required; the next section records the upgrade.
+Never alter a signed transaction's branch ID or claim a rejected broadcast succeeded.
+
+## NU7-compatible live testnet relay — 2026-10-27
+
+The isolated SDK migration (PR #24, commit `5d00570`) updated to
+`zcash_protocol 0.11.0-pre.1` and its compatible wallet SDK components.
+Its consensus table recognizes NU7 activation at public testnet height
+4,465,026; a regression test covers the activation boundary. The upgraded
+Rust wallet binaries compiled locally, the workspace tests and strict Clippy
+passed, and GitHub Actions passed.
+
+A mode-0600 copy of the funded wallet database was migrated successfully
+without exposing recovery material. After bounded lightwalletd synchronization,
+its sole testnet account showed 100,000,000 spendable Ironwood zatoshis.
+The wallet derived a 1,000,000-zatoshi shielded self-transfer proposal with
+10,000-zatoshi fee, completed the LeakLens pre-signing privacy review and both
+interactive authorization steps, and locally signed transaction
+`6620a249d10c8ecc0f54e5932f9309ce683cc5c5f4fde3a14cbb6cfa644c25e8`.
+
+At network tip 4,546,008 the standalone broadcaster verified that this
+transaction and the expected next-block consensus branch were both `Nu7`.
+The TLS testnet lightwalletd relay returned success (`error_code == 0`).
+After wallet synchronization, the wallet database recorded the transaction
+as mined at Zcash testnet height **4,546,012** (well before expiry 4,546,041).
+The original funded wallet database remained untouched during this test.
 
 ## Unverified and still required
 
 - [x] A funded, wallet-backed Zcash proposal and complete signing execution through the gate.
-- [ ] SDK update for NU7 testnet and fresh, compatible signing.
-- [ ] Testnet broadcast and confirmation (never use production funds).
+- [x] SDK update for NU7 testnet and fresh, compatible signing.
+- [x] Testnet relay accepted the signed NU7 transaction.
+- [x] Verify the transaction is mined in public testnet block 4,546,012.
 - [ ] An actually recorded two-minute video and its final accessible link.
 - [ ] Final hackathon submission URL, submitted source SHA, and confirmation receipt.
 
-**Important:** The CLI demonstrates a real funded wallet proposal and locally completed signing, but **not a successful testnet broadcast or confirmation**. The synthetic fixture-based demo remains a separate no-op path. The NU7-compatible SDK upgrade is required before claiming end-to-end network success.
+**Important:** The synthetic fixture-based demo remains a separate no-op path.
+The live wallet workflow is now proven through testnet mining; additional
+confirmation depth, the recorded demo, and final submission evidence remain outstanding.
