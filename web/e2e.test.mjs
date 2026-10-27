@@ -33,6 +33,34 @@ test('guest can review a real planned address without any wallet and no fake sen
   assert.equal(await page.getByText('Transaction submitted').count(),0);
  });
 });
+test('injected Noir-compatible provider drives real wallet screens and send approval',async()=>{
+ await browserPage(async page=>{
+  await page.addInitScript(()=>{
+   const addresses={transparent:'tm'+'a'.repeat(33),shielded:'ztestsapling'+'a'.repeat(80)};
+   window.__walletCalls=[];
+   window.noirwallet={isNoirWallet:true,version:'test',zcash:{request:async ({method,params})=>{
+    window.__walletCalls.push({method,params});
+    if(method==='zcash_requestAccounts'||method==='zcash_getAccounts')return addresses;
+    if(method==='zcash_getBalance')return {transparent:'1',shielded:'2',total:'3'};
+    if(method==='zcash_getTransactionHistory')return [];
+    if(method==='zcash_sendTransaction')return 'mock-txid-for-browser-test';
+    throw Error('Unknown method '+method);
+   },disconnect:async()=>{},on:()=>{}}};
+  });
+  await page.goto(base+'/app');
+  await page.getByText('3 TAZ').first().waitFor();
+  await page.locator('button[data-jump=send]').first().click();
+  await page.locator('#recipient').fill('tm'+'b'.repeat(33));
+  await page.locator('#amount').fill('0.01');
+  await page.getByRole('button',{name:/Review privacy/}).click();
+  await page.getByRole('button',{name:/Continue to wallet approval/}).click();
+  await page.getByText('Transaction submitted').waitFor();
+  const calls=await page.evaluate(()=>window.__walletCalls);
+  const send=calls.find(c=>c.method==='zcash_sendTransaction');
+  assert.deepEqual(send.params[0],{to:'tm'+'b'.repeat(33),amount:'0.01',fundingSource:'shielded'});
+ });
+});
+
 test('mobile navigation exposes receive and activity screens',async()=>{
  await browserPage(async page=>{
   await page.setViewportSize({width:390,height:844});
