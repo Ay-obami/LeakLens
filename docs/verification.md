@@ -140,6 +140,9 @@ transaction and the expected next-block consensus branch were both `Nu7`.
 The TLS testnet lightwalletd relay returned success (`error_code == 0`).
 After wallet synchronization, the wallet database recorded the transaction
 as mined at Zcash testnet height **4,546,012** (well before expiry 4,546,041).
+A follow-up sync at tip 4,546,014 showed **3 confirmations** and reconciled
+98,990,000 spendable Ironwood zatoshis, 1,000,000 pending-spendability
+self-transfer zatoshis, and the 10,000-zatoshi fee.
 The original funded wallet database remained untouched during this test.
 
 ## Unverified and still required
