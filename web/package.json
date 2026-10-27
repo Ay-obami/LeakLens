@@ -9,5 +9,13 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --experimental-strip-types --test src/*.test.ts"
   },
-  "devDependencies": { "typescript": "^5.9.3", "vite": "^7.1.12" }
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@noir-wallet/sdk": "^0.1.9"
+  }
 }
