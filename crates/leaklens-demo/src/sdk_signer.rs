@@ -6,7 +6,7 @@
 //! here. `create_proposed_transactions` persists signed transaction(s) in the
 //! wallet database; it does **not** broadcast them to the Zcash network.
 
-/// Invoke the pinned `zcash_client_backend` 0.24 signer **only** after the
+/// Invoke the NU7-compatible `zcash_client_backend` signer **only** after the
 /// [`PendingZcashReview`](crate::PendingZcashReview) has passed its gate.
 ///
 /// The macro expands at the wallet integration call site. Database-specific
@@ -26,7 +26,7 @@
 /// // the user for explicit consent via pending.review_mut().acknowledge().
 /// let signed_ids = leaklens_demo::execute_reviewed_zcash_signing!(
 ///     pending, &active_policy, &mut wallet_db, &network_params,
-///     &spend_prover, &output_prover, &spending_keys,
+///     &clock, &mut rng, &spend_prover, &output_prover, &spending_keys,
 /// )?;
 /// // The wallet still must explicitly retrieve and broadcast these txs.
 /// ```
@@ -34,12 +34,15 @@
 macro_rules! execute_reviewed_zcash_signing {
     (
         $pending:expr, $active_policy:expr, $wallet_db:expr, $params:expr,
+        $clock:expr, $rng:expr,
         $spend_prover:expr, $output_prover:expr, $spending_keys:expr $(,)?
     ) => {{
         let pending_review = $pending;
         let active_policy = $active_policy;
         let wallet_db = $wallet_db;
         let params = $params;
+        let clock = $clock;
+        let rng = $rng;
         let spend_prover = $spend_prover;
         let output_prover = $output_prover;
         let spending_keys = $spending_keys;
@@ -58,6 +61,8 @@ macro_rules! execute_reviewed_zcash_signing {
             >(
                 wallet_db,
                 params,
+                clock,
+                rng,
                 spend_prover,
                 output_prover,
                 spending_keys,

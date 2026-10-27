@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/leaklens-zcash", "crates/leaklens-core", "crates/leaklens-gate", "crates/leaklens-demo"]
+members = ["crates/leaklens-zcash", "crates/leaklens-core", "crates/leaklens-gate", "crates/leaklens-demo", "crates/leaklens-wallet"]
 
 [workspace.package]
 edition = "2024"
@@ -8,11 +8,11 @@ rust-version = "1.95"
 license = "MIT"
 
 [workspace.dependencies]
-zcash_client_backend = { version = "=0.24.0", features = ["orchard", "transparent-inputs"] }
-zcash_protocol = "=0.10.5"
-zcash_primitives = "=0.30.1"
-zcash_address = "=0.13.0"
-zip321 = "=0.9.0"
-orchard = "=0.15.5"
-zip32 = "0.2"
-zcash_keys = "=0.16.1"
+zcash_client_backend = { version = "=0.25.0-pre.2", features = ["orchard", "transparent-inputs"] }
+zcash_protocol = "=0.11.0-pre.1"
+zcash_primitives = "=0.31.0-pre.2"
+zcash_address = "=0.14.0-pre.2"
+zip321 = "=0.10.0-pre.2"
+orchard = "=0.16.0"
+zip32 = "0.3"
+zcash_keys = "=0.17.0-pre.2"
